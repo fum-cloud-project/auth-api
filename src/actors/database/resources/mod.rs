@@ -1,1 +1,78 @@
+use crate::actix::ResponseFuture;
+use crate::actix::{Handler, Message};
+use crate::actors::database::DbActor;
+use crate::db_schemas::resources::{Method, Resources};
+use mongodb::error::Error;
+use mongodb::results::{InsertOneResult, UpdateResult};
+use mongodb::{bson::doc, options::FindOptions};
 
+#[derive(Message)]
+#[rtype(result = "Result<(), ()>")]
+pub struct CreateOrUpdateResource {
+    pub method: Method,
+    pub path: String,
+    pub access: i32,
+}
+
+#[derive(Message)]
+#[rtype(result = "Result<Result<Resources, Error>, String>")]
+pub struct GetResource {
+    pub method: Method,
+    pub path: String,
+}
+
+impl Handler<CreateOrUpdateResource> for DbActor {
+    type Result = ResponseFuture<Result<(), ()>>;
+
+    fn handle(&mut self, msg: CreateOrUpdateResource, _: &mut Self::Context) -> Self::Result {
+        let collection = self.0.collection::<Resources>("Resources");
+        Box::pin(async move {
+            match collection
+                .find_one(doc! {"path" : &msg.path, "method" : &msg.method}, None)
+                .await
+            {
+                Ok(Some(_)) => {
+                    match collection
+                        .update_one(
+                            doc! {
+                                "method" : &msg.method,
+                                "path" : &msg.method
+                            },
+                            doc! {
+                                "access" : &msg.access
+                            },
+                            None,
+                        )
+                        .await
+                    {
+                        Ok(_) => Ok(()),
+                        _ => Err(()),
+                    }
+                }
+                Ok(None) => match collection.insert_one(Resources::new(&msg), None).await {
+                    Ok(_) => Ok(()),
+                    _ => Err(()),
+                },
+                _ => Err(()),
+            }
+        })
+    }
+}
+
+impl Handler<GetResource> for DbActor {
+    type Result = ResponseFuture<Result<Result<Resources, Error>, String>>;
+
+    fn handle(&mut self, msg: GetResource, _: &mut Self::Context) -> Self::Result {
+        let collection = self.0.collection::<Resources>("Resources");
+        Box::pin(async move {
+            match collection
+                .find_one(doc! {"path" : &msg.path, "method" : &msg.method}, None)
+                .await
+            {
+                Ok(Some(res)) => Ok(Ok(res)),
+                Ok(None) => Err(format!("Resource not found.")),
+                _ => Err(format!("Something went wrong")),
+            }
+        })
+    }
+}
