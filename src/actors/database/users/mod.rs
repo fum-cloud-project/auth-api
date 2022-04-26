@@ -3,7 +3,7 @@ use crate::actors::database::DbActor;
 use crate::db_schemas::users::Users;
 use bson::oid::ObjectId;
 use mongodb::error::Error;
-use mongodb::results::InsertOneResult;
+use mongodb::results::{InsertOneResult, UpdateResult};
 use mongodb::{bson::doc, options::FindOptions};
 #[derive(Message)]
 #[rtype(result = "Result<Result<InsertOneResult, Error>, String>")]
@@ -16,13 +16,20 @@ pub struct CreateUser {
 }
 
 #[derive(Message)]
-#[rtype(result = "Result<Users, Error>")]
-pub struct UpdateUser_ {
+#[rtype(result = "Result<Result<UpdateResult, Error>, String>")]
+pub struct UpdateUser {
+    pub _id: ObjectId,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub email: Option<String>,
-    pub access_level: Option<u16>,
     pub password: Option<String>,
+}
+
+#[derive(Message)]
+#[rtype(result = "Result<Result<UpdateResult, Error>, String>")]
+pub struct PromoteUser {
+    pub _id: ObjectId,
+    pub access_level: Option<u16>,
 }
 
 #[derive(Message)]
@@ -35,18 +42,49 @@ impl Handler<CreateUser> for DbActor {
     type Result = ResponseFuture<Result<Result<InsertOneResult, Error>, String>>;
 
     fn handle(&mut self, msg: CreateUser, _: &mut Self::Context) -> Self::Result {
-        println!("handling");
         let collection = self.0.collection::<Users>("Users");
-        println!("handling");
         Box::pin(async move {
             match collection.find_one(doc! {"email" : &msg.email}, None).await {
-                Ok(_) => Err(format!("User already exists.")),
+                Ok(Some(_)) => Err(format!("User already exists.")),
                 _ => Ok(collection.insert_one(Users::new(msg), None).await),
             }
         })
     }
 }
 
+impl Handler<UpdateUser> for DbActor {
+    type Result = ResponseFuture<Result<Result<UpdateResult, Error>, String>>;
+
+    fn handle(&mut self, msg: UpdateUser, _: &mut Self::Context) -> Self::Result {
+        let collection = self.0.collection::<Users>("Users");
+        Box::pin(async move {
+            match collection.find_one(doc! {"_id" : &msg._id}, None).await {
+                Ok(Some(user)) => {
+                    if let Some(_) = &msg.email {
+                        match collection.find_one(doc! {"email" : &msg.email}, None).await {
+                            Ok(Some(_)) => {
+                                return Err(format!("Email already exists."));
+                            }
+                            _ => {}
+                        }
+                    }
+                    Ok(collection
+                        .update_one(
+                            doc! {"_id" : &msg._id},
+                            doc! {
+                                "first_name" : if let Some(first_name) = msg.first_name {first_name} else {user.first_name},
+                                "last_name" : if let Some(last_name) = msg.last_name {last_name} else {user.last_name},
+                                "email" : if let Some(email) = msg.email {email} else {user.email},
+                                "password" : if let Some(password) = msg.password {password} else {user.password},
+                            },
+                            None)
+                        .await)
+                }
+                _ => Err(format!("User does not exist.")),
+            }
+        })
+    }
+}
 // impl Handler<CreateUser> for DbActor {
 //     type Result = QueryResult<User>;
 
