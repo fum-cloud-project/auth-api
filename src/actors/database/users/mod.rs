@@ -33,7 +33,7 @@ pub struct PromoteUser {
 }
 
 #[derive(Message)]
-#[rtype(result = "Result<Users, Error>")]
+#[rtype(result = "Result<Result<UpdateResult, Error>, String>")]
 pub struct DeleteUser {
     pub _id: ObjectId,
 }
@@ -80,6 +80,30 @@ impl Handler<UpdateUser> for DbActor {
                             None)
                         .await)
                 }
+                _ => Err(format!("User does not exist.")),
+            }
+        })
+    }
+}
+
+impl Handler<DeleteUser> for DbActor {
+    type Result = ResponseFuture<Result<Result<UpdateResult, Error>, String>>;
+
+    fn handle(&mut self, msg: DeleteUser, _: &mut Self::Context) -> Self::Result {
+        let collection = self.0.collection::<Users>("Users");
+        Box::pin(async move {
+            match collection.find_one(doc! {"_id" : &msg._id}, None).await {
+                Ok(Some(_)) => Ok(collection
+                    .update_one(
+                        doc! {
+                            "_id" : &msg._id
+                        },
+                        doc! {
+                            "is_deleted" : true
+                        },
+                        None,
+                    )
+                    .await),
                 _ => Err(format!("User does not exist.")),
             }
         })
