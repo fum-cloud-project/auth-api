@@ -1,6 +1,7 @@
 use crate::actix::{Handler, Message};
 use crate::actors::database::DbActor;
 use crate::db_schemas::users::Users;
+
 use bson::oid::ObjectId;
 #[derive(Message)]
 #[rtype(result = "Users")]
@@ -39,7 +40,6 @@ pub struct GetUsers;
 pub struct GetUser {
     pub email: String,
 }
-
 // impl Handler<CreateUser> for DbActor {
 //     type Result = QueryResult<User>;
 
