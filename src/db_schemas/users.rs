@@ -9,6 +9,6 @@ pub struct Users {
     pub email: String,
     pub password: String,
     pub access_level: u16,
-    pub creation_date: chrono::NaiveDateTime,
+    pub creation_date: chrono::DateTime<chrono::Utc>,
     pub is_deleted: bool,
 }
