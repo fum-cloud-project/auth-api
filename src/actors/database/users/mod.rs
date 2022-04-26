@@ -1,45 +1,52 @@
-use crate::actix::{Handler, Message};
+use crate::actix::{Handler, Message, ResponseFuture};
 use crate::actors::database::DbActor;
 use crate::db_schemas::users::Users;
-
 use bson::oid::ObjectId;
+use mongodb::error::Error;
+use mongodb::results::InsertOneResult;
+use mongodb::{bson::doc, options::FindOptions};
 #[derive(Message)]
-#[rtype(result = "Users")]
+#[rtype(result = "Result<Result<InsertOneResult, Error>, String>")]
 pub struct CreateUser {
     pub first_name: String,
     pub last_name: String,
     pub email: String,
     pub password: String,
-    pub access_level: i32,
-    pub created_at: chrono::NaiveDateTime,
+    pub access_level: u16,
 }
 
 #[derive(Message)]
-#[rtype(result = "Users")]
+#[rtype(result = "Result<Users, Error>")]
 pub struct UpdateUser_ {
-    pub id: i32,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub email: Option<String>,
-    pub access_level: Option<i32>,
+    pub access_level: Option<u16>,
     pub password: Option<String>,
 }
 
 #[derive(Message)]
-#[rtype(result = "Users")]
+#[rtype(result = "Result<Users, Error>")]
 pub struct DeleteUser {
     pub _id: ObjectId,
 }
 
-#[derive(Message)]
-#[rtype(result = "Vec<Users>")]
-pub struct GetUsers;
+impl Handler<CreateUser> for DbActor {
+    type Result = ResponseFuture<Result<Result<InsertOneResult, Error>, String>>;
 
-#[derive(Message)]
-#[rtype(result = "Users")]
-pub struct GetUser {
-    pub email: String,
+    fn handle(&mut self, msg: CreateUser, _: &mut Self::Context) -> Self::Result {
+        println!("handling");
+        let collection = self.0.collection::<Users>("Users");
+        println!("handling");
+        Box::pin(async move {
+            match collection.find_one(doc! {"email" : &msg.email}, None).await {
+                Ok(_) => Err(format!("User already exists.")),
+                _ => Ok(collection.insert_one(Users::new(msg), None).await),
+            }
+        })
+    }
 }
+
 // impl Handler<CreateUser> for DbActor {
 //     type Result = QueryResult<User>;
 

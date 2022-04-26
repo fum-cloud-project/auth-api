@@ -1,15 +1,20 @@
 extern crate actix;
 #[macro_use]
 extern crate dotenv_codegen;
+#[macro_use]
+extern crate serde;
+#[macro_use]
+extern crate mongodb;
 
 mod actors;
 mod api_handlers;
 mod bootstrap_utils;
-mod middlewares;
 mod db_schemas;
+mod middlewares;
 //local modules
 
 //external modules
+use crate::actix::Actor;
 use actix::SyncArbiter;
 use actix_web::middleware::Logger;
 use actix_web::{web::Data, App, HttpServer};
@@ -36,6 +41,26 @@ async fn main() -> std::io::Result<()> {
         println!("Created database");
         for cs_name in cs {
             println!("{}", cs_name);
+        }
+    }
+    let actor_db = actors::database::DbActor(db);
+    let db_addr = actor_db.start();
+    match db_addr
+        .clone()
+        .send(actors::database::users::CreateUser {
+            first_name: String::from("Tooraj"),
+            last_name: String::from("Taraz"),
+            email: String::from("tooraj.info@gmail.com"),
+            password: String::from("12345678"),
+            access_level: 100,
+        })
+        .await
+    {
+        Ok(res) => {
+            println!("ok {:?}", res);
+        }
+        Err(e) => {
+            println!(" err {:?}", e);
         }
     }
     env_logger::init_from_env(Env::default().default_filter_or("info"));

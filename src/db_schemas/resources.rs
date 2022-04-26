@@ -1,6 +1,7 @@
+use actix::MessageResponse;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, MessageResponse)]
 pub enum Method {
     GET,
     POST,
@@ -13,7 +14,7 @@ pub enum Method {
     PATCH,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, MessageResponse)]
 pub struct Resources {
     pub method: Method,
     pub path: String,
