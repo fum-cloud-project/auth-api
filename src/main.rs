@@ -13,7 +13,7 @@ mod db_schemas;
 mod middlewares;
 //local modules
 use crate::actors::database::DbActor;
-
+use bootstrap_utils::add_resources::add_resources;
 //external modules
 use actix::Actor;
 use actix::Addr;
@@ -43,6 +43,12 @@ async fn main() -> std::io::Result<()> {
     let db = client.database("cloudFUMAuthDB");
     let actor_db = actors::database::DbActor(db);
     let db_addr = actor_db.start();
+    match add_resources(db_addr.clone()).await {
+        Err(_) => {
+            panic!("Adding resources failed");
+        }
+        _ => {}
+    };
     env_logger::init_from_env(Env::default().default_filter_or("info"));
     HttpServer::new(move || {
         App::new()
