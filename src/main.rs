@@ -6,6 +6,7 @@ mod actors;
 mod api_handlers;
 mod bootstrap_utils;
 mod middlewares;
+mod db_schemas;
 //local modules
 
 //external modules
