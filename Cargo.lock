@@ -303,6 +303,7 @@ dependencies = [
  "actix",
  "actix-rt",
  "actix-web",
+ "bson",
  "chrono",
  "derive_more",
  "dotenv",
