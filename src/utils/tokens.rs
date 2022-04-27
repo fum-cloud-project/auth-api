@@ -1,1 +1,202 @@
+use crate::actix::Addr;
+use crate::actors::cache::tokens::{
+    AddNewPair, DelToken, DelTokenPair, TokenExists, TokenPairExists,
+};
+use crate::actors::cache::CacheActor;
+use crate::cache_schemas::tokens::{Claims, TokenType};
+use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 
+pub async fn gen_tokens(
+    user_id: String,
+    user_access_level: i32,
+    cache: Addr<CacheActor>,
+    secret: String,
+) -> Result<(String, String), ()> {
+    let refresh_token = Claims::new(
+        user_id.clone(),
+        user_access_level,
+        TokenType::REFRESH,
+        chrono::Duration::days(1),
+    );
+    println!("{:?}", refresh_token);
+    let access_token = Claims::new(
+        user_id,
+        user_access_level,
+        TokenType::ACCESS,
+        chrono::Duration::seconds(10),
+    );
+    println!("{:?}", access_token);
+
+    let refresh_token_string = match encode(
+        &Header::default(),
+        &refresh_token,
+        &EncodingKey::from_secret(secret.as_ref()),
+    ) {
+        Ok(val) => val,
+        _ => {
+            return Err(());
+        }
+    };
+
+    let access_token_string = match encode(
+        &Header::default(),
+        &access_token,
+        &EncodingKey::from_secret(secret.as_ref()),
+    ) {
+        Ok(val) => val,
+        _ => {
+            return Err(());
+        }
+    };
+
+    match cache
+        .send(AddNewPair {
+            access_tok: access_token_string.clone(),
+            refresh_tok: refresh_token_string.clone(),
+            access_exp: 10,
+            refresh_exp: 24 * 60 * 60,
+        })
+        .await
+    {
+        Ok(Ok(_)) => {
+            return Ok((access_token_string, refresh_token_string));
+        }
+        _ => {
+            return Err(());
+        }
+    }
+}
+
+#[inline(always)]
+fn is_token_expired(exp: i64, length: i64) -> bool {
+    chrono::Utc::now()
+        .naive_utc()
+        .signed_duration_since(chrono::NaiveDateTime::from_timestamp(exp, 0))
+        .num_seconds()
+        >= length
+}
+
+pub async fn verify_token(
+    token: String,
+    secret: String,
+    cache: Addr<CacheActor>,
+) -> Result<(String, i32), ()> {
+    let token_s = match decode::<Claims>(
+        &token,
+        &DecodingKey::from_secret(secret.as_ref()),
+        &Validation::default(),
+    ) {
+        Ok(val) => val,
+        _ => {
+            return Err(());
+        }
+    };
+    if token_s.claims.token_use_case != TokenType::ACCESS
+        || is_token_expired(token_s.claims.exp, 10)
+    {
+        return Err(());
+    }
+
+    match cache
+        .clone()
+        .send(TokenExists {
+            token: token.clone(),
+        })
+        .await
+    {
+        Ok(Ok(s)) if s => {}
+        _ => {
+            return Err(());
+        }
+    }
+
+    match cache
+        .clone()
+        .send(DelToken {
+            token: token.clone(),
+        })
+        .await
+    {
+        Ok(Ok(_)) => {
+            return Ok((token_s.claims.user_id, token_s.claims.user_access_level));
+        }
+        _ => {
+            return Err(());
+        }
+    }
+}
+
+pub async fn refresh_token(
+    token: String,
+    secret: String,
+    cache: Addr<CacheActor>,
+) -> Result<(String, String), ()> {
+    let token_s = match decode::<Claims>(
+        &token,
+        &DecodingKey::from_secret(secret.as_ref()),
+        &Validation::default(),
+    ) {
+        Ok(val) => val,
+        _ => {
+            return Err(());
+        }
+    };
+    if token_s.claims.token_use_case != TokenType::REFRESH
+        || is_token_expired(token_s.claims.exp, 24 * 60 * 60)
+    {
+        return Err(());
+    }
+
+    match cache
+        .clone()
+        .send(TokenExists {
+            token: token.clone(),
+        })
+        .await
+    {
+        Ok(Ok(s)) if s => {}
+        _ => {
+            return Err(());
+        }
+    }
+
+    match cache
+        .clone()
+        .send(TokenPairExists {
+            token: token.clone(),
+        })
+        .await
+    {
+        Ok(Ok(s)) if s == false => {}
+        _ => {
+            return Err(());
+        }
+    }
+
+    match cache.clone().send(DelToken { token: token }).await {
+        Ok(_) => {}
+        _ => {
+            return Err(());
+        }
+    }
+    gen_tokens(
+        token_s.claims.user_id,
+        token_s.claims.user_access_level,
+        cache.clone(),
+        secret,
+    )
+    .await
+}
+
+pub async fn revoke_token(
+    token: String,
+    secret: String,
+    cache: Addr<CacheActor>,
+) -> Result<(), ()> {
+    match cache.clone().send(DelTokenPair { token: token }).await {
+        Ok(Ok(_)) => Ok(()),
+        _ => {
+            return Err(());
+        }
+    }
+}
