@@ -36,17 +36,20 @@ impl Handler<CreateOrUpdateResource> for DbActor {
                         .update_one(
                             doc! {
                                 "method" : &msg.method,
-                                "path" : &msg.method
+                                "path" : &msg.path
                             },
                             doc! {
-                                "access" : &msg.access
+                                "$set" : {"access" : &msg.access}
                             },
                             None,
                         )
                         .await
                     {
                         Ok(_) => Ok(()),
-                        _ => Err(()),
+                        Err(e) => {
+                            println!("e : {:?}", e);
+                            Err(())
+                        }
                     }
                 }
                 Ok(None) => match collection.insert_one(Resources::new(&msg), None).await {

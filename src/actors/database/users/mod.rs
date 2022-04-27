@@ -72,10 +72,12 @@ impl Handler<UpdateUser> for DbActor {
                         .update_one(
                             doc! {"_id" : &msg._id},
                             doc! {
-                                "first_name" : if let Some(first_name) = msg.first_name {first_name} else {user.first_name},
-                                "last_name" : if let Some(last_name) = msg.last_name {last_name} else {user.last_name},
-                                "email" : if let Some(email) = msg.email {email} else {user.email},
-                                "password" : if let Some(password) = msg.password {password} else {user.password},
+                                "$set" : {
+                                    "first_name" : if let Some(first_name) = msg.first_name {first_name} else {user.first_name},
+                                    "last_name" : if let Some(last_name) = msg.last_name {last_name} else {user.last_name},
+                                    "email" : if let Some(email) = msg.email {email} else {user.email},
+                                    "password" : if let Some(password) = msg.password {password} else {user.password},
+                                }
                             },
                             None)
                         .await)
@@ -99,7 +101,7 @@ impl Handler<DeleteUser> for DbActor {
                             "_id" : &msg._id
                         },
                         doc! {
-                            "is_deleted" : true
+                            "$set" : {"is_deleted" : true}
                         },
                         None,
                     )
