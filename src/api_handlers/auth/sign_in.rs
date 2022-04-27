@@ -13,7 +13,7 @@ use actix_web::{
 };
 use serde_json::json;
 
-#[post("/login")]
+#[post("/sign_in")]
 pub async fn sign_in(user: Json<UserDataSignIn>, state: Data<AppState>) -> impl Responder {
     let db = state.as_ref().db.clone();
     let secret = &state.as_ref().secret;

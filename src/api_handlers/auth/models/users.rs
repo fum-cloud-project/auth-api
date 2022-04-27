@@ -7,6 +7,11 @@ pub struct UserDataSignIn {
 }
 
 #[derive(Serialize, Deserialize)]
+pub struct UserDataSignOut {
+    pub token: Option<String>,
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct UserDataSignUp {
     pub first_name: Option<String>,
     pub last_name: Option<String>,

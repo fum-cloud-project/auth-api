@@ -9,7 +9,7 @@ pub async fn add_resources(db: Addr<DbActor>) -> Result<(), ()> {
     match db
         .send(CreateOrUpdateResource {
             path: format!("/api/auth/sign_in"),
-            access: 1,
+            access: 0,
             method: Method::POST,
         })
         .await
@@ -25,13 +25,29 @@ pub async fn add_resources(db: Addr<DbActor>) -> Result<(), ()> {
     match db
         .send(CreateOrUpdateResource {
             path: format!("/api/auth/sign_up"),
-            access: 2,
+            access: 0,
             method: Method::POST,
         })
         .await
     {
         Ok(Ok(_)) => {
             println!("Added POST /api/auth/sign_up")
+        }
+        _ => {
+            eprintln!("Adding to DB failed!");
+            return Err(());
+        }
+    }
+    match db
+        .send(CreateOrUpdateResource {
+            path: format!("/api/auth/sign_out"),
+            access: 1,
+            method: Method::POST,
+        })
+        .await
+    {
+        Ok(Ok(_)) => {
+            println!("Added POST /api/auth/sign_out")
         }
         _ => {
             eprintln!("Adding to DB failed!");
