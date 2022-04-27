@@ -14,7 +14,6 @@ mod db_schemas;
 mod middlewares;
 mod utils;
 //local modules
-use crate::actors::cache::CacheActor;
 use crate::actors::database::DbActor;
 use bootstrap_utils::add_resources::add_resources;
 //external modules
@@ -26,11 +25,11 @@ use actix_web::{web::Data, App, HttpServer};
 use env_logger::Env;
 use mongodb::{options::ClientOptions, Client};
 use redis::Client as RedisClient;
+use redis::aio::ConnectionManager;
 
 //structs
 pub struct AppState {
     pub db: Addr<DbActor>,
-    pub cache: Addr<CacheActor>,
     pub salt: String,
     pub secret: String,
 }
@@ -38,7 +37,6 @@ pub struct AppState {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let db_url = dotenv!("DATABASE_URL");
-    let cache_url = dotenv!("REDIS_URL");
     let client_options = match ClientOptions::parse(db_url).await {
         Ok(co) => co,
         _ => {
@@ -55,23 +53,12 @@ async fn main() -> std::io::Result<()> {
         }
         _ => {}
     };
-
-    let cc = redis::Client::open(cache_url).unwrap();
-    let actor_cache = if let Ok(cm) = cc.get_tokio_connection_manager().await {
-        cm
-    } else {
-        panic!("Init failed.");
-    };
-    let actor_cache = actors::cache::CacheActor(actor_cache);
-    let cache_addr = actor_cache.start();
-
     env_logger::init_from_env(Env::default().default_filter_or("info"));
     HttpServer::new(move || {
         App::new()
             .wrap(Logger::default())
             .app_data(Data::new(AppState {
                 db: db_addr.clone(),
-                cache: cache_addr.clone(),
                 salt: dotenv!("SALT_STR").to_string(),
                 secret: dotenv!("SECRET").to_string(),
             }))
