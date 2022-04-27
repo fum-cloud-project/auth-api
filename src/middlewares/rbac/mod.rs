@@ -77,7 +77,7 @@ where
             actix_web::http::Method::POST => Method::POST,
             actix_web::http::Method::PUT => Method::PUT,
             actix_web::http::Method::TRACE => Method::TRACE,
-            _ => Method::HEAD,
+            _ => Method::INVALID,
         };
         let get_url = GetResource {
             path: path.to_string(),

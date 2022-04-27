@@ -12,6 +12,7 @@ pub enum Method {
     OPTIONS,
     TRACE,
     PATCH,
+    INVALID,
 }
 
 #[derive(Debug, Serialize, Deserialize, MessageResponse)]
@@ -45,6 +46,7 @@ impl std::convert::From<Method> for Bson {
             Method::POST => format!("POST"),
             Method::PUT => format!("PUT"),
             Method::TRACE => format!("TRACE"),
+            Method::INVALID => format!("INVALID"),
         })
     }
 }
