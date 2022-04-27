@@ -9,7 +9,7 @@ pub struct Users {
     pub last_name: String,
     pub email: String,
     pub password: String,
-    pub access_level: u16,
+    pub access_level: i32,
     pub creation_date: chrono::DateTime<chrono::Utc>,
     pub is_deleted: bool,
 }

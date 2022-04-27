@@ -12,6 +12,7 @@ mod bootstrap_utils;
 mod cache_schemas;
 mod db_schemas;
 mod middlewares;
+mod state;
 mod utils;
 //local modules
 use crate::actors::cache::CacheActor;
