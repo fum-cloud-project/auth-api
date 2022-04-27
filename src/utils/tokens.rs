@@ -18,14 +18,12 @@ pub async fn gen_tokens(
         TokenType::REFRESH,
         chrono::Duration::days(1),
     );
-    println!("{:?}", refresh_token);
     let access_token = Claims::new(
         user_id,
         user_access_level,
         TokenType::ACCESS,
         chrono::Duration::seconds(10),
     );
-    println!("{:?}", access_token);
 
     let refresh_token_string = match encode(
         &Header::default(),
