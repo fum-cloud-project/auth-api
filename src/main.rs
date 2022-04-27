@@ -11,6 +11,7 @@ mod api_handlers;
 mod bootstrap_utils;
 mod db_schemas;
 mod middlewares;
+mod utils;
 //local modules
 use crate::actors::database::DbActor;
 use bootstrap_utils::add_resources::add_resources;
