@@ -12,7 +12,7 @@ pub struct CreateUser {
     pub last_name: String,
     pub email: String,
     pub password: String,
-    pub access_level: u16,
+    pub access_level: i32,
 }
 
 #[derive(Message)]
@@ -29,13 +29,19 @@ pub struct UpdateUser {
 #[rtype(result = "Result<Result<UpdateResult, Error>, String>")]
 pub struct PromoteUser {
     pub _id: ObjectId,
-    pub access_level: Option<u16>,
+    pub access_level: Option<i32>,
 }
 
 #[derive(Message)]
 #[rtype(result = "Result<Result<UpdateResult, Error>, String>")]
 pub struct DeleteUser {
     pub _id: ObjectId,
+}
+
+#[derive(Message)]
+#[rtype(result = "Result<Result<Users, Error>, String>")]
+pub struct GetUser {
+    pub email: String,
 }
 
 impl Handler<CreateUser> for DbActor {
@@ -106,6 +112,20 @@ impl Handler<DeleteUser> for DbActor {
                         None,
                     )
                     .await),
+                _ => Err(format!("User does not exist.")),
+            }
+        })
+    }
+}
+
+impl Handler<GetUser> for DbActor {
+    type Result = ResponseFuture<Result<Result<Users, Error>, String>>;
+
+    fn handle(&mut self, msg: GetUser, _: &mut Self::Context) -> Self::Result {
+        let collection = self.0.collection::<Users>("Users");
+        Box::pin(async move {
+            match collection.find_one(doc! {"email" : &msg.email}, None).await {
+                Ok(Some(u)) => Ok(Ok(u)),
                 _ => Err(format!("User does not exist.")),
             }
         })
