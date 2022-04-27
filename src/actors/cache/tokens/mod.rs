@@ -19,6 +19,12 @@ pub struct TokenExists {
 }
 
 #[derive(Message)]
+#[rtype(result = "Result<bool, ()>")]
+pub struct TokenPairExists {
+    pub token: String,
+}
+
+#[derive(Message)]
 #[rtype(result = "Result<(), ()>")]
 pub struct DelToken {
     pub token: String,
@@ -83,6 +89,38 @@ impl Handler<TokenExists> for CacheActor {
     }
 }
 
+impl Handler<TokenPairExists> for CacheActor {
+    type Result = ResponseFuture<Result<bool, ()>>;
+
+    fn handle(&mut self, msg: TokenPairExists, _: &mut Self::Context) -> Self::Result {
+        let mut connection = self.0.clone();
+        Box::pin(async move {
+            let pair = match redis::cmd("GET")
+                .arg(&msg.token)
+                .query_async(&mut connection)
+                .await
+            {
+                Ok::<Option<String>, redis::RedisError>(Some(s)) => s,
+                Ok::<Option<String>, redis::RedisError>(None) => {
+                    return Ok(false);
+                }
+                _ => {
+                    return Err(());
+                }
+            };
+            match redis::cmd("GET")
+                .arg(&pair)
+                .query_async(&mut connection)
+                .await
+            {
+                Ok::<Option<String>, redis::RedisError>(Some(_)) => Ok(true),
+                Ok::<Option<String>, redis::RedisError>(None) => Ok(false),
+                _ => Err(()),
+            }
+        })
+    }
+}
+
 impl Handler<DelToken> for CacheActor {
     type Result = ResponseFuture<Result<(), ()>>;
 
@@ -131,7 +169,16 @@ impl Handler<DelTokenPair> for CacheActor {
                             }
                         }
                         _ => {
-                            return Err(());
+                            match redis::cmd("DEL")
+                                .arg(&msg.token)
+                                .query_async(&mut connection)
+                                .await
+                            {
+                                Ok::<Option<i32>, redis::RedisError>(Some(i)) if i == 1 => Ok(()),
+                                _ => {
+                                    return Err(());
+                                }
+                            }
                         }
                     }
                 }

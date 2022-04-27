@@ -1,4 +1,4 @@
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub enum TokenType {
     REFRESH,
     ACCESS,
@@ -13,7 +13,7 @@ pub struct Claims {
 }
 
 impl Claims {
-    fn new(
+    pub fn new(
         user_id: String,
         user_access_level: i32,
         token_use_case: TokenType,

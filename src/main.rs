@@ -20,12 +20,10 @@ use bootstrap_utils::add_resources::add_resources;
 //external modules
 use actix::Actor;
 use actix::Addr;
-use actix::SyncArbiter;
 use actix_web::middleware::Logger;
 use actix_web::{web::Data, App, HttpServer};
 use env_logger::Env;
 use mongodb::{options::ClientOptions, Client};
-use redis::Client as RedisClient;
 
 //structs
 pub struct AppState {
