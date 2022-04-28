@@ -2,7 +2,7 @@ use crate::actix::Addr;
 use crate::actors::cache::CacheActor;
 use crate::actors::database::resources::GetResource;
 use crate::actors::database::DbActor;
-use crate::db_schemas::resources::{Method, Resources};
+use crate::db_schemas::resources::Method;
 use crate::utils::tokens::verify_token;
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use actix_web_httpauth::extractors::AuthExtractor;
