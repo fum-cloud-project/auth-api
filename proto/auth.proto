@@ -1,14 +1,42 @@
 syntax = "proto3";
 package auth;
-
-service Greeter {
-    rpc SayHello (HelloRequest) returns (HelloReply);
+service AuthService{
+    rpc hasAccess(Resource) returns(Access);
+    rpc GetUser(JasonWebToken) returns(User);
 }
 
-message HelloRequest {
-   string name = 1;
+message JasonWebToken {
+  string Jwt = 1;
 }
 
-message HelloReply {
-    string message = 1;
+message User {
+  optional string _id = 1;
+  optional string first_name = 2;
+  optional string last_name = 3;
+  optional string email = 4;
+  optional int32 access_level = 5;
+  int32 error_code = 6;
+}
+
+message Resource {
+  enum Method {
+      INVALID = 0;
+      GET = 1;
+      POST = 2;
+      PUT = 3;
+      DELETE = 4;
+      HEAD = 5;
+      CONNECT = 6;
+      OPTIONS = 7;
+      TRACE = 8;
+      PATCH = 9;
+  }
+  Method method = 1;
+  string path = 2;
+  string jwt = 3;
+}
+
+message Access {
+  optional bool has_access = 1;
+  int32 error_code = 2;
 }
