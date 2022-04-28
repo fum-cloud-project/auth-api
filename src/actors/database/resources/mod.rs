@@ -14,7 +14,7 @@ pub struct CreateOrUpdateResource {
 }
 
 #[derive(Message)]
-#[rtype(result = "Result<Result<Resources, Error>, String>")]
+#[rtype(result = "Result<Result<Resources, Error>, u8>")]
 pub struct GetResource {
     pub method: Method,
     pub path: String,
@@ -62,7 +62,7 @@ impl Handler<CreateOrUpdateResource> for DbActor {
 }
 
 impl Handler<GetResource> for DbActor {
-    type Result = ResponseFuture<Result<Result<Resources, Error>, String>>;
+    type Result = ResponseFuture<Result<Result<Resources, Error>, u8>>;
 
     fn handle(&mut self, msg: GetResource, _: &mut Self::Context) -> Self::Result {
         let collection = self.0.collection::<Resources>("Resources");
@@ -72,8 +72,8 @@ impl Handler<GetResource> for DbActor {
                 .await
             {
                 Ok(Some(res)) => Ok(Ok(res)),
-                Ok(None) => Err(format!("Resource not found.")),
-                _ => Err(format!("Something went wrong")),
+                Ok(None) => Err(0),
+                _ => Err(1),
             }
         })
     }

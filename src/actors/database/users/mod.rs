@@ -44,6 +44,12 @@ pub struct GetUser {
     pub email: String,
 }
 
+#[derive(Message)]
+#[rtype(result = "Result<Result<Users, Error>, u8>")]
+pub struct GetUserWithId {
+    pub _id: ObjectId,
+}
+
 impl Handler<CreateUser> for DbActor {
     type Result = ResponseFuture<Result<Result<InsertOneResult, Error>, String>>;
 
@@ -125,6 +131,21 @@ impl Handler<GetUser> for DbActor {
         let collection = self.0.collection::<Users>("Users");
         Box::pin(async move {
             match collection.find_one(doc! {"email" : &msg.email}, None).await {
+                Ok(Some(u)) => Ok(Ok(u)),
+                Ok(None) => Err(0),
+                _ => Err(1),
+            }
+        })
+    }
+}
+
+impl Handler<GetUserWithId> for DbActor {
+    type Result = ResponseFuture<Result<Result<Users, Error>, u8>>;
+
+    fn handle(&mut self, msg: GetUserWithId, _: &mut Self::Context) -> Self::Result {
+        let collection = self.0.collection::<Users>("Users");
+        Box::pin(async move {
+            match collection.find_one(doc! {"_id" : &msg._id}, None).await {
                 Ok(Some(u)) => Ok(Ok(u)),
                 Ok(None) => Err(0),
                 _ => Err(1),
