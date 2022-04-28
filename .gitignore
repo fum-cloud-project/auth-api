@@ -1,5 +1,5 @@
 /target
 /helper
 /logs
-helper.py
+/__pycache__
 .env
