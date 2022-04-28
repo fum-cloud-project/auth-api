@@ -2,9 +2,8 @@ use crate::actix::ResponseFuture;
 use crate::actix::{Handler, Message};
 use crate::actors::database::DbActor;
 use crate::db_schemas::resources::{Method, Resources};
+use mongodb::bson::doc;
 use mongodb::error::Error;
-use mongodb::results::{InsertOneResult, UpdateResult};
-use mongodb::{bson::doc, options::FindOptions};
 
 #[derive(Message)]
 #[rtype(result = "Result<(), ()>")]

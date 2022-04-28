@@ -2,9 +2,9 @@ use crate::actix::{Handler, Message, ResponseFuture};
 use crate::actors::database::DbActor;
 use crate::db_schemas::users::Users;
 use bson::oid::ObjectId;
+use mongodb::bson::doc;
 use mongodb::error::Error;
 use mongodb::results::{InsertOneResult, UpdateResult};
-use mongodb::{bson::doc, options::FindOptions};
 #[derive(Message)]
 #[rtype(result = "Result<Result<InsertOneResult, Error>, String>")]
 pub struct CreateUser {
@@ -39,7 +39,7 @@ pub struct DeleteUser {
 }
 
 #[derive(Message)]
-#[rtype(result = "Result<Result<Users, Error>, String>")]
+#[rtype(result = "Result<Result<Users, Error>, u8>")]
 pub struct GetUser {
     pub email: String,
 }
@@ -119,14 +119,15 @@ impl Handler<DeleteUser> for DbActor {
 }
 
 impl Handler<GetUser> for DbActor {
-    type Result = ResponseFuture<Result<Result<Users, Error>, String>>;
+    type Result = ResponseFuture<Result<Result<Users, Error>, u8>>;
 
     fn handle(&mut self, msg: GetUser, _: &mut Self::Context) -> Self::Result {
         let collection = self.0.collection::<Users>("Users");
         Box::pin(async move {
             match collection.find_one(doc! {"email" : &msg.email}, None).await {
                 Ok(Some(u)) => Ok(Ok(u)),
-                _ => Err(format!("User does not exist.")),
+                Ok(None) => Err(0),
+                _ => Err(1),
             }
         })
     }

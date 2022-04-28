@@ -1,8 +1,6 @@
 use crate::actix::ResponseFuture;
 use crate::actix::{Handler, Message};
 use crate::actors::cache::CacheActor;
-use crate::db_schemas::resources::{Method, Resources};
-use redis::Cmd;
 #[derive(Message)]
 #[rtype(result = "Result<(), ()>")]
 pub struct AddNewPair {

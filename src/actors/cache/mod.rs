@@ -1,5 +1,4 @@
 use crate::actix::{Actor, Context};
-use r2d2::Pool;
 use redis::aio::ConnectionManager;
 pub mod tokens;
 
