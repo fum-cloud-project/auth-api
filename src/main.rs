@@ -17,6 +17,8 @@ mod utils;
 //local modules
 use crate::actors::cache::CacheActor;
 use crate::actors::database::DbActor;
+use crate::api_handlers::auth::{sign_in::sign_in, sign_out::sign_out, sign_up::sign_up};
+use crate::middlewares::rbac;
 use bootstrap_utils::add_resources::add_resources;
 //external modules
 use actix::Actor;
@@ -68,6 +70,19 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .wrap(Logger::default())
+            .wrap(rbac::Rbac {
+                db: db_addr.clone(),
+                cache: cache_addr.clone(),
+                secret: dotenv!("SECRET").to_string(),
+            })
+            .service(
+                actix_web::web::scope("/api").service(
+                    actix_web::web::scope("/auth")
+                        .service(sign_out)
+                        .service(sign_in)
+                        .service(sign_up),
+                ),
+            )
             .app_data(Data::new(AppState {
                 db: db_addr.clone(),
                 cache: cache_addr.clone(),
