@@ -12,7 +12,7 @@ use actix_web::{
 use serde_json::json;
 
 #[post("/sign_out")]
-pub async fn sign_in(token: Json<UserDataSignOut>, state: Data<AppState>) -> impl Responder {
+pub async fn sign_out(token: Json<UserDataSignOut>, state: Data<AppState>) -> impl Responder {
     let cache = state.as_ref().cache.clone();
     let secret = &state.as_ref().secret;
     let secret = secret.to_string();
