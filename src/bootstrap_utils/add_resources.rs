@@ -1,7 +1,7 @@
 use crate::actix::Addr;
 use crate::actors::database::resources::CreateOrUpdateResource;
 use crate::actors::database::DbActor;
-use crate::db_schemas::resources::{Method, Resources};
+use crate::db_schemas::resources::Method;
 
 pub async fn add_resources(db: Addr<DbActor>) -> Result<(), ()> {
     let db = db.clone();
@@ -48,6 +48,22 @@ pub async fn add_resources(db: Addr<DbActor>) -> Result<(), ()> {
     {
         Ok(Ok(_)) => {
             println!("Added POST /api/auth/sign_out")
+        }
+        _ => {
+            eprintln!("Adding to DB failed!");
+            return Err(());
+        }
+    }
+    match db
+        .send(CreateOrUpdateResource {
+            path: format!("/api/auth/refresh"),
+            access: 0,
+            method: Method::POST,
+        })
+        .await
+    {
+        Ok(Ok(_)) => {
+            println!("Added POST /api/auth/refresh")
         }
         _ => {
             eprintln!("Adding to DB failed!");
