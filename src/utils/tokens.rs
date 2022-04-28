@@ -4,7 +4,6 @@ use crate::actors::cache::tokens::{
 };
 use crate::actors::cache::CacheActor;
 use crate::cache_schemas::tokens::{Claims, TokenType};
-use crate::db_schemas::users::Users;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 
 pub async fn gen_tokens(
