@@ -4,6 +4,7 @@ use crate::actors::cache::tokens::{
 };
 use crate::actors::cache::CacheActor;
 use crate::cache_schemas::tokens::{Claims, TokenType};
+use crate::db_schemas::users::Users;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 
 pub async fn gen_tokens(
@@ -205,4 +206,27 @@ pub async fn revoke_token(token: String, cache: Addr<CacheActor>) -> Result<bool
             return Err(());
         }
     }
+}
+
+pub async fn verify_token_and_get_user_id(
+    token: String,
+    secret: String,
+) -> Result<bson::oid::ObjectId, ()> {
+    let token_s = match decode::<Claims>(
+        &token,
+        &DecodingKey::from_secret(secret.as_ref()),
+        &Validation::default(),
+    ) {
+        Ok(val) => val,
+        _ => {
+            return Err(());
+        }
+    };
+    if token_s.claims.token_use_case != TokenType::ACCESS
+        || is_token_expired(token_s.claims.exp, 10)
+    {
+        return Err(());
+    }
+
+    Ok(bson::oid::ObjectId::parse_str(token_s.claims.user_id).unwrap())
 }
