@@ -33,7 +33,7 @@ pub async fn sign_up(user: Json<UserDataSignUp>, state: Data<AppState>) -> impl 
         Ok(val) => val,
         _ => {
             return HttpResponse::Unauthorized().json(json!({
-                "issues" : ["wrong password or email"],
+                "issues" : ["something went wrong"]
             }));
         }
     };
@@ -50,6 +50,7 @@ pub async fn sign_up(user: Json<UserDataSignUp>, state: Data<AppState>) -> impl 
         Ok(Ok(Ok(_))) => HttpResponse::Ok().json(json!({
             "message": "Your account was created successfully, use login api to get auth token"
         })),
+        Ok(Err(e)) => HttpResponse::BadRequest().json(json!({ "message": e })),
         _ => HttpResponse::InternalServerError().json(json!({
             "issues" : ["something went wrong"]
         })),
