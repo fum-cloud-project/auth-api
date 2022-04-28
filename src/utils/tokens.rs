@@ -128,7 +128,7 @@ pub async fn refresh_token(
     token: String,
     secret: String,
     cache: Addr<CacheActor>,
-) -> Result<(String, String), ()> {
+) -> Result<(String, String), u8> {
     let token_s = match decode::<Claims>(
         &token,
         &DecodingKey::from_secret(secret.as_ref()),
@@ -136,13 +136,13 @@ pub async fn refresh_token(
     ) {
         Ok(val) => val,
         _ => {
-            return Err(());
+            return Err(0);
         }
     };
     if token_s.claims.token_use_case != TokenType::REFRESH
         || is_token_expired(token_s.claims.exp, 24 * 60 * 60)
     {
-        return Err(());
+        return Err(0);
     }
 
     match cache
@@ -153,8 +153,11 @@ pub async fn refresh_token(
         .await
     {
         Ok(Ok(s)) if s => {}
+        Ok(Ok(s)) if !s => {
+            return Err(0);
+        }
         _ => {
-            return Err(());
+            return Err(1);
         }
     }
 
@@ -166,33 +169,38 @@ pub async fn refresh_token(
         .await
     {
         Ok(Ok(s)) if s == false => {}
+        Ok(Ok(s)) if s == true => {
+            //Access token has not expired yet
+            return Err(2);
+        }
         _ => {
-            return Err(());
+            return Err(1);
         }
     }
 
     match cache.clone().send(DelToken { token: token }).await {
         Ok(_) => {}
         _ => {
-            return Err(());
+            return Err(1);
         }
     }
-    gen_tokens(
+    match gen_tokens(
         token_s.claims.user_id,
         token_s.claims.user_access_level,
         cache.clone(),
         secret,
     )
     .await
+    {
+        Err(_) => Err(0),
+        Ok(s) => Ok(s),
+    }
 }
 
-pub async fn revoke_token(
-    token: String,
-    secret: String,
-    cache: Addr<CacheActor>,
-) -> Result<(), ()> {
+pub async fn revoke_token(token: String, cache: Addr<CacheActor>) -> Result<bool, ()> {
     match cache.clone().send(DelTokenPair { token: token }).await {
-        Ok(Ok(_)) => Ok(()),
+        Ok(Ok(_)) => Ok(true),
+        Ok(Err(_)) => Ok(false),
         _ => {
             return Err(());
         }
