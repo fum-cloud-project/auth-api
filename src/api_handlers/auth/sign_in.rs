@@ -62,7 +62,7 @@ pub async fn sign_in(user: Json<UserDataSignIn>, state: Data<AppState>) -> impl 
                 }))
             }
         }
-        Ok(Err(_)) => HttpResponse::Unauthorized().json(json!({
+        Ok(Err(e)) if e == 0 => HttpResponse::Unauthorized().json(json!({
             "issues" : ["wrong password or email"]
         })),
         _ => HttpResponse::InternalServerError().json(json!({
