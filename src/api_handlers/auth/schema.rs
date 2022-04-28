@@ -81,3 +81,23 @@ pub fn get_sign_out_schema() -> Value {
         }
     )
 }
+
+#[inline(always)]
+pub fn get_refresh_schema() -> Value {
+    json!(
+        {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "$id": "https://cloud.project/signout.schema.json",
+            "title": "SignOut",
+            "description": "Sign out form",
+            "type": "object",
+            "properties": {
+                "refresh_token": {
+                    "description": "User's valid refresh token",
+                    "type": "string",
+                },
+            },
+            "required": [ "refresh_token" ]
+        }
+    )
+}

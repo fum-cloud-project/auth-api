@@ -8,7 +8,7 @@ pub struct UserDataSignIn {
 
 #[derive(Serialize, Deserialize)]
 pub struct UserDataSignOut {
-    pub token: Option<String>,
+    pub refresh_token: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -17,4 +17,9 @@ pub struct UserDataSignUp {
     pub last_name: Option<String>,
     pub email: Option<String>,
     pub password: Option<String>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct UserDataRefresh {
+    pub refresh_token: Option<String>,
 }
