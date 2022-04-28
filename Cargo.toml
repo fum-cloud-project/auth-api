@@ -8,6 +8,10 @@ edition = "2021"
 name = "grpc-server"
 path = "src/grpc_server.rs"
 
+[[bin]]
+name = "api-server"
+path = "src/main.rs"
+
 [dependencies]
 log = "0.4"
 fern = { version = "0.6", features = ["colored"] }
@@ -31,9 +35,9 @@ serde_derive = "1.0"
 serde_json = "1.0"
 redis = { version = "0.21.5", features = ["tokio-comp", "connection-manager"] }
 actix-web-httpauth = "0.6.0"
-tonic = "0.7"
+tonic = { version = "0.7", features = ["compression", "prost"] }
 prost = "0.10"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 
 [build-dependencies]
-tonic-build = "0.7"
+tonic-build = { version = "0.7", features = ["compression"]}
