@@ -3,8 +3,6 @@ extern crate actix;
 extern crate dotenv_codegen;
 #[macro_use]
 extern crate serde;
-#[macro_use]
-extern crate mongodb;
 
 mod actors;
 mod api_handlers;
@@ -15,31 +13,53 @@ mod middlewares;
 mod state;
 mod utils;
 //local modules
-use crate::actors::cache::CacheActor;
-use crate::actors::database::DbActor;
-use crate::api_handlers::auth::{sign_in::sign_in, sign_out::sign_out, sign_up::sign_up};
+use crate::api_handlers::auth::{
+    refresh::refresh, sign_in::sign_in, sign_out::sign_out, sign_up::sign_up,
+};
 use crate::middlewares::rbac;
+use crate::state::AppState;
 use bootstrap_utils::add_resources::add_resources;
 //external modules
 use actix::Actor;
-use actix::Addr;
 use actix_web::middleware::Logger;
 use actix_web::{web::Data, App, HttpServer};
-use env_logger::Env;
+use fern::colors::{Color, ColoredLevelConfig};
 use mongodb::{options::ClientOptions, Client};
 
-//structs
-pub struct AppState {
-    pub db: Addr<DbActor>,
-    pub cache: Addr<CacheActor>,
-    pub salt: String,
-    pub secret: String,
+fn setup_logger(file_path: &str) -> Result<(), fern::InitError> {
+    let colors_line = ColoredLevelConfig::new()
+        .error(Color::Red)
+        .warn(Color::Yellow)
+        .info(Color::White)
+        .debug(Color::White)
+        .trace(Color::BrightBlack);
+    let colors_level = colors_line.clone().info(Color::Green);
+    fern::Dispatch::new()
+        .format(move |out, message, record| {
+            out.finish(format_args!(
+                "{color_line}[{date}][{target}][{level}{color_line}] {message}\x1B[0m",
+                color_line = format_args!(
+                    "\x1B[{}m",
+                    colors_line.get_color(&record.level()).to_fg_str()
+                ),
+                date = chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
+                target = record.target(),
+                level = colors_level.color(record.level()),
+                message = message,
+            ))
+        })
+        .level(log::LevelFilter::Debug)
+        .chain(std::io::stderr())
+        .chain(fern::log_file(file_path)?)
+        .apply()?;
+    Ok(())
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let db_url = dotenv!("DATABASE_URL");
     let cache_url = dotenv!("REDIS_URL");
+    let log_file = dotenv!("LOG_FILE");
     let client_options = match ClientOptions::parse(db_url).await {
         Ok(co) => co,
         _ => {
@@ -66,7 +86,7 @@ async fn main() -> std::io::Result<()> {
     let actor_cache = actors::cache::CacheActor(actor_cache);
     let cache_addr = actor_cache.start();
 
-    env_logger::init_from_env(Env::default().default_filter_or("info"));
+    setup_logger(log_file).expect("Logger initialization failed.");
     HttpServer::new(move || {
         App::new()
             .wrap(Logger::default())
@@ -79,6 +99,7 @@ async fn main() -> std::io::Result<()> {
                 actix_web::web::scope("/api").service(
                     actix_web::web::scope("/auth")
                         .service(sign_out)
+                        .service(refresh)
                         .service(sign_in)
                         .service(sign_up),
                 ),
