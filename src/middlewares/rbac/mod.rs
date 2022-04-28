@@ -130,6 +130,11 @@ where
                         }
                     }
                 }
+                Ok(Err(c)) if c == 0 => {
+                    return Err(actix_web::error::ErrorUnauthorized(
+                        "You don't have access to this resource",
+                    ));
+                }
                 _ => {
                     return Err(actix_web::error::ErrorInternalServerError(
                         "Something went wrong.",
