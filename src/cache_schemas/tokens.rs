@@ -10,6 +10,7 @@ pub struct Claims {
     pub user_access_level: i32,
     pub token_use_case: TokenType,
     pub exp: i64,
+    pub issued: u32,
 }
 
 impl Claims {
@@ -27,6 +28,7 @@ impl Claims {
                 .checked_add_signed(dur)
                 .unwrap()
                 .timestamp(),
+            issued: chrono::Utc::now().timestamp_subsec_nanos(),
         }
     }
 }
