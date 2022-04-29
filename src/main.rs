@@ -16,6 +16,7 @@ mod utils;
 use crate::api_handlers::auth::{
     refresh::refresh, sign_in::sign_in, sign_out::sign_out, sign_up::sign_up,
 };
+use crate::bootstrap_utils::setup_logger::setup_logger;
 use crate::middlewares::rbac;
 use crate::state::AppState;
 use bootstrap_utils::add_resources::add_resources;
@@ -23,43 +24,14 @@ use bootstrap_utils::add_resources::add_resources;
 use actix::Actor;
 use actix_web::middleware::Logger;
 use actix_web::{web::Data, App, HttpServer};
-use fern::colors::{Color, ColoredLevelConfig};
 use mongodb::{options::ClientOptions, Client};
-
-fn setup_logger(file_path: &str) -> Result<(), fern::InitError> {
-    let colors_line = ColoredLevelConfig::new()
-        .error(Color::Red)
-        .warn(Color::Yellow)
-        .info(Color::White)
-        .debug(Color::White)
-        .trace(Color::BrightBlack);
-    let colors_level = colors_line.clone().info(Color::Green);
-    fern::Dispatch::new()
-        .format(move |out, message, record| {
-            out.finish(format_args!(
-                "{color_line}[{date}][{target}][{level}{color_line}] {message}\x1B[0m",
-                color_line = format_args!(
-                    "\x1B[{}m",
-                    colors_line.get_color(&record.level()).to_fg_str()
-                ),
-                date = chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
-                target = record.target(),
-                level = colors_level.color(record.level()),
-                message = message,
-            ))
-        })
-        .level(log::LevelFilter::Debug)
-        .chain(std::io::stderr())
-        .chain(fern::log_file(file_path)?)
-        .apply()?;
-    Ok(())
-}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let db_url = dotenv!("DATABASE_URL");
     let cache_url = dotenv!("REDIS_URL");
-    let log_file = dotenv!("LOG_FILE");
+    let log_file = dotenv!("API_LOG_FILE");
+    setup_logger(log_file).expect("Logger initialization failed.");
     let client_options = match ClientOptions::parse(db_url).await {
         Ok(co) => co,
         _ => {
@@ -86,7 +58,6 @@ async fn main() -> std::io::Result<()> {
     let actor_cache = actors::cache::CacheActor(actor_cache);
     let cache_addr = actor_cache.start();
 
-    setup_logger(log_file).expect("Logger initialization failed.");
     HttpServer::new(move || {
         App::new()
             .wrap(Logger::default())
@@ -111,7 +82,11 @@ async fn main() -> std::io::Result<()> {
                 secret: dotenv!("SECRET").to_string(),
             }))
     })
-    .bind(("0.0.0.0", 8080))?
+    .bind((
+        dotenv!("API_SERVER_ADDRESS"),
+        dotenv!("API_SERVER_PORT").parse().unwrap(),
+    ))?
+    .workers(12)
     .run()
     .await
 }

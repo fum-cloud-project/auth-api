@@ -14,50 +14,22 @@ mod middlewares;
 mod state;
 mod utils;
 //local modules
+use crate::bootstrap_utils::setup_logger::setup_logger;
 use crate::grpc::auth_impl::Auth;
 use bootstrap_utils::add_resources::add_resources;
 use grpc::auth::auth_service_server::AuthServiceServer;
 use tonic::transport::Server;
 //external modules
 use actix::Actor;
-use fern::colors::{Color, ColoredLevelConfig};
 use mongodb::{options::ClientOptions, Client};
-
-fn setup_logger(file_path: &str) -> Result<(), fern::InitError> {
-    let colors_line = ColoredLevelConfig::new()
-        .error(Color::Red)
-        .warn(Color::Yellow)
-        .info(Color::White)
-        .debug(Color::White)
-        .trace(Color::BrightBlack);
-    let colors_level = colors_line.clone().info(Color::Green);
-    fern::Dispatch::new()
-        .format(move |out, message, record| {
-            out.finish(format_args!(
-                "{color_line}[{date}][{target}][{level}{color_line}] {message}\x1B[0m",
-                color_line = format_args!(
-                    "\x1B[{}m",
-                    colors_line.get_color(&record.level()).to_fg_str()
-                ),
-                date = chrono::Local::now().format("%Y-%m-%d %H:%M:%S"),
-                target = record.target(),
-                level = colors_level.color(record.level()),
-                message = message,
-            ))
-        })
-        .level(log::LevelFilter::Debug)
-        .chain(std::io::stderr())
-        .chain(fern::log_file(file_path)?)
-        .apply()?;
-    Ok(())
-}
 
 #[actix_web::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let addr = "0.0.0.0:50051".parse()?;
+    let addr = dotenv!("GRPC_SERVER_URL_AND_PORT").parse()?;
     let db_url = dotenv!("DATABASE_URL");
     let cache_url = dotenv!("REDIS_URL");
-    let log_file = dotenv!("LOG_FILE");
+    let log_file = dotenv!("GRPC_LOG_FILE");
+    setup_logger(log_file).expect("Logger initialization failed.");
     let client_options = match ClientOptions::parse(db_url).await {
         Ok(co) => co,
         _ => {
@@ -84,7 +56,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let actor_cache = actors::cache::CacheActor(actor_cache);
     let cache_addr = actor_cache.start();
 
-    setup_logger(log_file).expect("Logger initialization failed.");
     let auth_server = Auth {
         db: db_addr.clone(),
         cache: cache_addr.clone(),
