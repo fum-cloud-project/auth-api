@@ -56,7 +56,10 @@ impl Handler<CreateUser> for DbActor {
     fn handle(&mut self, msg: CreateUser, _: &mut Self::Context) -> Self::Result {
         let collection = self.0.collection::<Users>("Users");
         Box::pin(async move {
-            match collection.find_one(doc! {"email" : &msg.email}, None).await {
+            match collection
+                .find_one(doc! {"email" : &msg.email, "is_deleted" : false}, None)
+                .await
+            {
                 Ok(Some(_)) => Err(format!("User already exists.")),
                 _ => Ok(collection.insert_one(Users::new(msg), None).await),
             }
@@ -73,7 +76,10 @@ impl Handler<UpdateUser> for DbActor {
             match collection.find_one(doc! {"_id" : &msg._id}, None).await {
                 Ok(Some(user)) => {
                     if let Some(_) = &msg.email {
-                        match collection.find_one(doc! {"email" : &msg.email}, None).await {
+                        match collection
+                            .find_one(doc! {"email" : &msg.email, "is_deleted" : false}, None)
+                            .await
+                        {
                             Ok(Some(_)) => {
                                 return Err(format!("Email already exists."));
                             }
@@ -106,7 +112,10 @@ impl Handler<DeleteUser> for DbActor {
     fn handle(&mut self, msg: DeleteUser, _: &mut Self::Context) -> Self::Result {
         let collection = self.0.collection::<Users>("Users");
         Box::pin(async move {
-            match collection.find_one(doc! {"_id" : &msg._id}, None).await {
+            match collection
+                .find_one(doc! {"_id" : &msg._id, "is_deleted" : false}, None)
+                .await
+            {
                 Ok(Some(_)) => Ok(collection
                     .update_one(
                         doc! {
@@ -130,7 +139,10 @@ impl Handler<GetUser> for DbActor {
     fn handle(&mut self, msg: GetUser, _: &mut Self::Context) -> Self::Result {
         let collection = self.0.collection::<Users>("Users");
         Box::pin(async move {
-            match collection.find_one(doc! {"email" : &msg.email}, None).await {
+            match collection
+                .find_one(doc! {"email" : &msg.email, "is_deleted" : false}, None)
+                .await
+            {
                 Ok(Some(u)) => Ok(Ok(u)),
                 Ok(None) => Err(0),
                 _ => Err(1),
@@ -145,7 +157,10 @@ impl Handler<GetUserWithId> for DbActor {
     fn handle(&mut self, msg: GetUserWithId, _: &mut Self::Context) -> Self::Result {
         let collection = self.0.collection::<Users>("Users");
         Box::pin(async move {
-            match collection.find_one(doc! {"_id" : &msg._id}, None).await {
+            match collection
+                .find_one(doc! {"_id" : &msg._id, "is_deleted" : false}, None)
+                .await
+            {
                 Ok(Some(u)) => Ok(Ok(u)),
                 Ok(None) => Err(0),
                 _ => Err(1),
