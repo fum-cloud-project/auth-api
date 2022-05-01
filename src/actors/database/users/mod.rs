@@ -83,8 +83,6 @@ pub struct CountUsersWithFilter {
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub access_level: Option<(i32, CompareType)>,
-    pub skip: u64,
-    pub limit: i64,
 }
 
 impl Handler<CreateUser> for DbActor {
