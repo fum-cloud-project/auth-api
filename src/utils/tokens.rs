@@ -1,6 +1,6 @@
 use crate::actix::Addr;
 use crate::actors::cache::tokens::{
-    AddNewPair, DelToken, DelTokenPair, TokenExists, TokenPairExists,
+    AddNewPair, DelToken, DelTokenPair, IsTokenOwnerRevoked, TokenExists, TokenPairExists,
 };
 use crate::actors::cache::CacheActor;
 use crate::cache_schemas::tokens::{Claims, TokenType};
@@ -97,6 +97,19 @@ pub async fn verify_token(
 
     match cache
         .clone()
+        .send(IsTokenOwnerRevoked {
+            id: token_s.claims.user_id.clone(),
+        })
+        .await
+    {
+        Ok(Ok(s)) if s => {
+            return Err(());
+        }
+        _ => {}
+    }
+
+    match cache
+        .clone()
         .send(TokenExists {
             token: token.clone(),
         })
@@ -139,6 +152,7 @@ pub async fn refresh_token(
             return Err(0);
         }
     };
+
     if token_s.claims.token_use_case != TokenType::REFRESH
         || is_token_expired(token_s.claims.exp, 24 * 60 * 60)
     {
