@@ -63,12 +63,12 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .wrap(Logger::default())
             .wrap(rbac::Rbac {
                 db: db_addr.clone(),
                 cache: cache_addr.clone(),
                 secret: dotenv!("SECRET").to_string(),
             })
+            .wrap(Logger::default())
             .service(
                 actix_web::web::scope("/api")
                     .service(
