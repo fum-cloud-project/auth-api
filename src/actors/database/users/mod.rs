@@ -5,6 +5,16 @@ use bson::oid::ObjectId;
 use mongodb::bson::doc;
 use mongodb::error::Error;
 use mongodb::results::{InsertOneResult, UpdateResult};
+
+#[derive(PartialEq, Eq, Clone, Copy, Debug)]
+pub enum CompareType {
+    EQ,
+    LTE,
+    GTE,
+    LT,
+    GT,
+}
+
 #[derive(Message)]
 #[rtype(result = "Result<Result<InsertOneResult, Error>, String>")]
 pub struct CreateUser {
@@ -48,6 +58,15 @@ pub struct GetUser {
 #[rtype(result = "Result<Result<Users, Error>, u8>")]
 pub struct GetUserWithId {
     pub _id: ObjectId,
+}
+
+#[derive(Message)]
+#[rtype(result = "Result<Result<Users, Error>, u8>")]
+pub struct GetUsersWithFilter {
+    pub email: Option<String>,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
+    pub access_level: Option<(i32, CompareType)>,
 }
 
 impl Handler<CreateUser> for DbActor {
