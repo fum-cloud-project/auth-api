@@ -86,7 +86,7 @@ async fn main() -> std::io::Result<()> {
         dotenv!("API_SERVER_ADDRESS"),
         dotenv!("API_SERVER_PORT").parse().unwrap(),
     ))?
-    .workers(12)
+    .workers(dotenv!("WORKET_THREAD_NUM").parse().unwrap())
     .run()
     .await
 }
