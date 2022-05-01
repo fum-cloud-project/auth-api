@@ -7,6 +7,7 @@ use crate::utils::tokens::verify_token;
 use actix_web::HttpMessage;
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use actix_web_httpauth::extractors::AuthExtractor;
+use serde_json::json;
 use std::future::{ready, Ready};
 use std::rc::Rc;
 
@@ -64,11 +65,14 @@ where
     forward_ready!(service);
 
     fn call(&self, req: ServiceRequest) -> Self::Future {
-        let path = if let Some(s) = req.match_pattern() {
+        let mut path = if let Some(s) = req.match_pattern() {
             s.to_owned()
         } else {
             req.path().to_owned()
         };
+        if path.chars().last().unwrap_or_default() == '/' {
+            path.pop();
+        }
         let db = self.db.clone();
         let cache = self.cache.clone();
         let bearer_tok = BearerAuth::from_service_request(&req);
@@ -109,23 +113,23 @@ where
                     let bearer_tok: String = match bearer_tok.await {
                         Ok(val) => val.token().chars().filter(|c| !c.is_whitespace()).collect(),
                         _ => {
-                            return Err(actix_web::error::ErrorUnauthorized(
-                                "You don't have access to this resource",
-                            ));
+                            return Err(actix_web::error::ErrorUnauthorized(json!({
+                                "issues" : ["You don't have access to this resource"]
+                            })));
                         }
                     };
                     let ids = match verify_token(bearer_tok, secret, cache.clone()).await {
                         Ok(ids) => ids,
                         _ => {
-                            return Err(actix_web::error::ErrorUnauthorized(
-                                "You don't have access to this resource",
-                            ));
+                            return Err(actix_web::error::ErrorUnauthorized(json!({
+                                "issues" : ["You don't have access to this resource"]
+                            })));
                         }
                     };
                     if ids.1 < res.access {
-                        return Err(actix_web::error::ErrorUnauthorized(
-                            "You don't have access to this resource",
-                        ));
+                        return Err(actix_web::error::ErrorUnauthorized(json!({
+                            "issues" : ["You don't have access to this resource"]
+                        })));
                     } else {
                         {
                             req.extensions_mut().insert(ids.0);
@@ -142,14 +146,14 @@ where
                     }
                 }
                 Ok(Err(c)) if c == 0 => {
-                    return Err(actix_web::error::ErrorUnauthorized(
-                        "You don't have access to this resource",
-                    ));
+                    return Err(actix_web::error::ErrorUnauthorized(json!({
+                        "issues" : ["You don't have access to this resource"]
+                    })));
                 }
                 _ => {
-                    return Err(actix_web::error::ErrorInternalServerError(
-                        "Something went wrong.",
-                    ));
+                    return Err(actix_web::error::ErrorInternalServerError(json!({
+                        "issues" : ["Something went wrong"]
+                    })));
                 }
             }
         })
