@@ -1,6 +1,6 @@
 use crate::actors::database::users::UpdateUser;
-use crate::api_handlers::users::models::users::UserDataUpdateAdmin;
-use crate::api_handlers::users::schema::get_admin_update_schema;
+use crate::api_handlers::users::models::users::UserDataUpdate;
+use crate::api_handlers::users::schema::get_update_schema;
 use crate::state::AppState;
 use crate::utils::passwords::hash_password;
 use crate::utils::validations::validate;
@@ -15,7 +15,7 @@ use serde_json::json;
 #[put("/")]
 pub async fn update(
     req: HttpRequest,
-    user: Json<UserDataUpdateAdmin>,
+    user: Json<UserDataUpdate>,
     state: Data<AppState>,
 ) -> impl Responder {
     let id = ObjectId::parse_str(req.extensions().get::<String>().unwrap()).unwrap();
@@ -29,7 +29,7 @@ pub async fn update(
             return HttpResponse::InternalServerError().json("Something went wrong");
         }
     };
-    match validate(get_admin_update_schema(), user_json) {
+    match validate(get_update_schema(), user_json) {
         Ok(_) => {}
         Err(e) => {
             return HttpResponse::BadRequest().json(json!({ "issues": e }));

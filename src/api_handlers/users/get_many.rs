@@ -5,7 +5,6 @@ use actix_web::{
     web::{Data, Query},
     HttpResponse, Responder,
 };
-use bson::oid::ObjectId;
 use serde::Deserialize;
 use serde_json::json;
 
