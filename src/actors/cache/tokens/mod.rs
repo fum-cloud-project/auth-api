@@ -34,6 +34,56 @@ pub struct DelTokenPair {
     pub token: String,
 }
 
+#[derive(Message)]
+#[rtype(result = "Result<bool, ()>")]
+pub struct IsTokenOwnerRevoked {
+    pub id: String,
+}
+
+#[derive(Message)]
+#[rtype(result = "Result<(), ()>")]
+pub struct BanUser {
+    pub id: String,
+    pub dur: i64,
+}
+
+impl Handler<IsTokenOwnerRevoked> for CacheActor {
+    type Result = ResponseFuture<Result<bool, ()>>;
+
+    fn handle(&mut self, msg: IsTokenOwnerRevoked, _: &mut Self::Context) -> Self::Result {
+        let mut connection = self.0.clone();
+        Box::pin(async move {
+            match redis::cmd("GET")
+                .arg(&msg.id)
+                .query_async(&mut connection)
+                .await
+            {
+                Ok::<Option<String>, redis::RedisError>(Some(_)) => Ok(true),
+                Ok::<Option<String>, redis::RedisError>(None) => Ok(false),
+                _ => Err(()),
+            }
+        })
+    }
+}
+
+impl Handler<BanUser> for CacheActor {
+    type Result = ResponseFuture<Result<(), ()>>;
+
+    fn handle(&mut self, msg: BanUser, _: &mut Self::Context) -> Self::Result {
+        let mut connection = self.0.clone();
+        Box::pin(async move {
+            match redis::cmd("SET")
+                .arg(&[&msg.id, &msg.id, "EX", &msg.dur.to_string()])
+                .query_async(&mut connection)
+                .await
+            {
+                Ok::<Vec<String>, redis::RedisError>(_) => Ok(()),
+                Err(_) => Err(()),
+            }
+        })
+    }
+}
+
 impl Handler<AddNewPair> for CacheActor {
     type Result = ResponseFuture<Result<(), ()>>;
 
