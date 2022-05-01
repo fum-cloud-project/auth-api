@@ -16,6 +16,10 @@ mod utils;
 use crate::api_handlers::auth::{
     refresh::refresh, sign_in::sign_in, sign_out::sign_out, sign_up::sign_up,
 };
+use crate::api_handlers::users::{
+    create::create, delete::delete_admin, delete_acc::delete, get_many::get_many, get_one::get_one,
+    update::update_admin, update_acc::update,
+};
 use crate::bootstrap_utils::setup_logger::setup_logger;
 use crate::middlewares::rbac;
 use crate::state::AppState;
@@ -23,12 +27,8 @@ use bootstrap_utils::add_resources::add_resources;
 //external modules
 use actix::Actor;
 use actix_web::middleware::Logger;
-use actix_web::{get, web::Data, App, HttpServer};
+use actix_web::{web::Data, App, HttpServer};
 use mongodb::{options::ClientOptions, Client};
-#[get("/show/{id}")]
-async fn user_detail(path: actix_web::web::Path<(u32,)>) -> actix_web::HttpResponse {
-    actix_web::HttpResponse::Ok().body(format!("User detail: {}", path.into_inner().0))
-}
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let db_url = dotenv!("DATABASE_URL");
@@ -70,14 +70,24 @@ async fn main() -> std::io::Result<()> {
                 secret: dotenv!("SECRET").to_string(),
             })
             .service(
-                actix_web::web::scope("/api").service(
-                    actix_web::web::scope("/auth")
-                        .service(sign_out)
-                        .service(refresh)
-                        .service(sign_in)
-                        .service(sign_up)
-                        .service(user_detail),
-                ),
+                actix_web::web::scope("/api")
+                    .service(
+                        actix_web::web::scope("/auth")
+                            .service(sign_out)
+                            .service(refresh)
+                            .service(sign_in)
+                            .service(sign_up),
+                    )
+                    .service(
+                        actix_web::web::scope("/users")
+                            .service(create)
+                            .service(update)
+                            .service(update_admin)
+                            .service(get_one)
+                            .service(get_many)
+                            .service(delete)
+                            .service(delete_admin),
+                    ),
             )
             .app_data(Data::new(AppState {
                 db: db_addr.clone(),

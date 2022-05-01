@@ -9,14 +9,110 @@ pub async fn add_resources(db: Addr<DbActor>) -> Result<(), ()> {
 
     match db
         .send(CreateOrUpdateResource {
-            path: format!("/api/auth/show/{{id}}"),
-            access: 0,
+            path: format!("/api/users"),
+            access: 2,
+            method: Method::POST,
+        })
+        .await
+    {
+        Ok(Ok(_)) => {
+            info!("Added POST /api/users")
+        }
+        _ => {
+            error!("Adding to DB failed!");
+            return Err(());
+        }
+    }
+    match db
+        .send(CreateOrUpdateResource {
+            path: format!("/api/users"),
+            access: 1,
+            method: Method::DELETE,
+        })
+        .await
+    {
+        Ok(Ok(_)) => {
+            info!("Added DELETE /api/users")
+        }
+        _ => {
+            error!("Adding to DB failed!");
+            return Err(());
+        }
+    }
+    match db
+        .send(CreateOrUpdateResource {
+            path: format!("/api/users/{{id}}"),
+            access: 2,
+            method: Method::DELETE,
+        })
+        .await
+    {
+        Ok(Ok(_)) => {
+            info!("Added DELETE /api/users/{{id}}")
+        }
+        _ => {
+            error!("Adding to DB failed!");
+            return Err(());
+        }
+    }
+    match db
+        .send(CreateOrUpdateResource {
+            path: format!("/api/users"),
+            access: 2,
             method: Method::GET,
         })
         .await
     {
         Ok(Ok(_)) => {
-            info!("Added POST /api/auth/sign_in")
+            info!("Added GET /api/users")
+        }
+        _ => {
+            error!("Adding to DB failed!");
+            return Err(());
+        }
+    }
+    match db
+        .send(CreateOrUpdateResource {
+            path: format!("/api/users/{{id}}"),
+            access: 2,
+            method: Method::GET,
+        })
+        .await
+    {
+        Ok(Ok(_)) => {
+            info!("Added GET /api/users/{{id}}")
+        }
+        _ => {
+            error!("Adding to DB failed!");
+            return Err(());
+        }
+    }
+    match db
+        .send(CreateOrUpdateResource {
+            path: format!("/api/users/{{id}}"),
+            access: 2,
+            method: Method::PUT,
+        })
+        .await
+    {
+        Ok(Ok(_)) => {
+            info!("Added PUT /api/users/{{id}}")
+        }
+        _ => {
+            error!("Adding to DB failed!");
+            return Err(());
+        }
+    }
+    match db
+        .send(CreateOrUpdateResource {
+            path: format!("/api/users"),
+            access: 2,
+            method: Method::PUT,
+        })
+        .await
+    {
+        Ok(Ok(_)) => {
+            info!("Added PUT /api/users")
         }
         _ => {
             error!("Adding to DB failed!");
