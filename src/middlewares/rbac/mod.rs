@@ -4,9 +4,11 @@ use crate::actors::database::resources::GetResource;
 use crate::actors::database::DbActor;
 use crate::db_schemas::resources::Method;
 use crate::utils::tokens::verify_token;
+use actix_web::HttpMessage;
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use actix_web_httpauth::extractors::AuthExtractor;
 use std::future::{ready, Ready};
+use std::rc::Rc;
 
 use actix_web::{
     dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
@@ -22,7 +24,7 @@ pub struct Rbac {
 
 impl<S, B> Transform<S, ServiceRequest> for Rbac
 where
-    S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
+    S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error> + 'static,
     S::Future: 'static,
     B: 'static,
 {
@@ -34,7 +36,7 @@ where
 
     fn new_transform(&self, service: S) -> Self::Future {
         ready(Ok(RbacMiddleware {
-            service: service,
+            service: std::rc::Rc::new(service),
             db: self.db.clone(),
             cache: self.cache.clone(),
             secret: self.secret.chars().collect(),
@@ -43,7 +45,7 @@ where
 }
 
 pub struct RbacMiddleware<S> {
-    service: S,
+    service: Rc<S>,
     db: Addr<DbActor>,
     cache: Addr<CacheActor>,
     secret: String,
@@ -51,7 +53,7 @@ pub struct RbacMiddleware<S> {
 
 impl<S, B> Service<ServiceRequest> for RbacMiddleware<S>
 where
-    S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
+    S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error> + 'static,
     S::Future: 'static,
     B: 'static,
 {
@@ -83,13 +85,14 @@ where
             path: path.to_string(),
             method: method,
         };
-        let fut = self.service.call(req);
+        let srv = Rc::clone(&self.service);
 
         Box::pin(async move {
             let db = db.clone();
             match db.send(get_url).await {
                 Ok(Ok(Ok(res))) => {
                     if res.access == 0 {
+                        let fut = srv.call(req);
                         match fut.await {
                             Ok(res) => {
                                 return Ok(res);
@@ -120,6 +123,10 @@ where
                             "You don't have access to this resource",
                         ));
                     } else {
+                        {
+                            req.extensions_mut().insert(ids.0);
+                        }
+                        let fut = srv.call(req);
                         match fut.await {
                             Ok(res) => {
                                 return Ok(res);
