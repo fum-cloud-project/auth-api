@@ -64,7 +64,7 @@ pub async fn update_admin(
         .await
     {
         Ok(Ok(Ok(_))) => HttpResponse::Ok().json(json!({
-            "message": "User was created successfully"
+            "message": "User was updated successfully"
         })),
         Ok(Err(e)) => HttpResponse::BadRequest().json(json!({ "message": e })),
         _ => HttpResponse::InternalServerError().json(json!({

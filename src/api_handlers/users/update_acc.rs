@@ -58,7 +58,7 @@ pub async fn update(
         .await
     {
         Ok(Ok(Ok(_))) => HttpResponse::Ok().json(json!({
-            "message": "User was created successfully"
+            "message": "Your account was updated successfully"
         })),
         Ok(Err(e)) => HttpResponse::BadRequest().json(json!({ "message": e })),
         _ => HttpResponse::InternalServerError().json(json!({
