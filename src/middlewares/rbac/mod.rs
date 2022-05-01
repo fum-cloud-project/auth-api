@@ -64,7 +64,11 @@ where
     forward_ready!(service);
 
     fn call(&self, req: ServiceRequest) -> Self::Future {
-        let path = req.path();
+        let path = if let Some(s) = req.match_pattern() {
+            s.to_owned()
+        } else {
+            req.path().to_owned()
+        };
         let db = self.db.clone();
         let cache = self.cache.clone();
         let bearer_tok = BearerAuth::from_service_request(&req);
@@ -82,7 +86,7 @@ where
             _ => Method::INVALID,
         };
         let get_url = GetResource {
-            path: path.to_string(),
+            path: path,
             method: method,
         };
         let srv = Rc::clone(&self.service);
