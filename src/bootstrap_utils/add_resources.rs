@@ -9,6 +9,22 @@ pub async fn add_resources(db: Addr<DbActor>) -> Result<(), ()> {
 
     match db
         .send(CreateOrUpdateResource {
+            path: format!("/api/auth/show/{{id}}"),
+            access: 0,
+            method: Method::GET,
+        })
+        .await
+    {
+        Ok(Ok(_)) => {
+            info!("Added POST /api/auth/sign_in")
+        }
+        _ => {
+            error!("Adding to DB failed!");
+            return Err(());
+        }
+    }
+    match db
+        .send(CreateOrUpdateResource {
             path: format!("/api/auth/sign_in"),
             access: 0,
             method: Method::POST,

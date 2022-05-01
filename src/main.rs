@@ -23,9 +23,12 @@ use bootstrap_utils::add_resources::add_resources;
 //external modules
 use actix::Actor;
 use actix_web::middleware::Logger;
-use actix_web::{web::Data, App, HttpServer};
+use actix_web::{get, web::Data, App, HttpServer};
 use mongodb::{options::ClientOptions, Client};
-
+#[get("/show/{id}")]
+async fn user_detail(path: actix_web::web::Path<(u32,)>) -> actix_web::HttpResponse {
+    actix_web::HttpResponse::Ok().body(format!("User detail: {}", path.into_inner().0))
+}
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let db_url = dotenv!("DATABASE_URL");
@@ -72,7 +75,8 @@ async fn main() -> std::io::Result<()> {
                         .service(sign_out)
                         .service(refresh)
                         .service(sign_in)
-                        .service(sign_up),
+                        .service(sign_up)
+                        .service(user_detail),
                 ),
             )
             .app_data(Data::new(AppState {
