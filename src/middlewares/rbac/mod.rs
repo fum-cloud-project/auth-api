@@ -133,6 +133,7 @@ where
                     } else {
                         {
                             req.extensions_mut().insert(ids.0);
+                            req.extensions_mut().insert(ids.1);
                         }
                         let fut = srv.call(req);
                         match fut.await {
