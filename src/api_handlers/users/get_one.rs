@@ -22,7 +22,9 @@ pub async fn get_one(id: Path<(String,)>, state: Data<AppState>) -> impl Respond
             "message": "User retrieved successfully",
             "data" : [s],
         })),
-        Ok(Err(e)) => HttpResponse::BadRequest().json(json!({ "message": e })),
+        Ok(Err(e)) if e == 0 => {
+            HttpResponse::NotFound().json(json!({ "message": "This user does not exist" }))
+        }
         _ => HttpResponse::InternalServerError().json(json!({
             "issues" : ["something went wrong"]
         })),
