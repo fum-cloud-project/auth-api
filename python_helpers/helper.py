@@ -15,69 +15,75 @@ url = "http://localhost:8080/api/auth/"
 def signup(first_name, last_name, email, password):
     payload = {'first_name': first_name, 'last_name': last_name, 'email': email, 'password': password}
     headers = {'Content-Type': 'application/json'}
+    print(json.dumps(payload, indent=4, ensure_ascii=False))
     response = requests.request("POST", url + "sign_up", headers=headers, data=json.dumps(payload))
-    print(response.text)
+    print(json.dumps(json.loads(response.text), indent=4))
     return response.text
 
 def signin(email, password):
     payload = {'email': email, 'password': password}
     headers = {'Content-Type': 'application/json'}
+    print(json.dumps(payload, indent=4, ensure_ascii=False))
     response = requests.request("POST", url + "sign_in", headers=headers, data=json.dumps(payload))
-    print(response.text)
+    print(json.dumps(json.loads(response.text), indent=4))
     return json.loads(response.text)
 
 def signout(token, reftok):
     payload = {'refresh_token': reftok}
     headers = {'Content-Type' : 'application/json', 'Authorization': 'Bearer ' + token}
+    print(json.dumps(payload, indent=4, ensure_ascii=False))
     response = requests.request("POST", url + "sign_out", headers=headers, data=json.dumps(payload))
-    print(response.text)
+    print(json.dumps(json.loads(response.text), indent=4))
     return response.text
 
 def refresh(token, reftok):
     payload = {'refresh_token': reftok}
     headers = {'Content-Type' : 'application/json', 'Authorization': 'Bearer ' + token}
+    print(json.dumps(payload, indent=4, ensure_ascii=False))
     response = requests.request("POST", url + "refresh", headers=headers, data=json.dumps(payload))
-    print(response.text)
+    print(json.dumps(json.loads(response.text), indent=4))
     return json.loads(response.text)
 
 def update_me(token, first_name, last_name, email, password, url="http://localhost:8080/api/users/"):
     payload = {'first_name': first_name, 'last_name': last_name, 'email': email, 'password': password}
+    print(json.dumps(payload, indent=4, ensure_ascii=False))
     headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token}
     response = requests.request("PUT", url, headers=headers, data=json.dumps(payload))
-    print(response.text)
+    print(json.dumps(json.loads(response.text), indent=4))
     return json.loads(response.text)
 
 def update_admin(token, _id, first_name, last_name, email, password, access_level, url="http://localhost:8080/api/users/"):
     payload = {'first_name': first_name, 'last_name': last_name, 'email': email, 'password': password, 'access_level': access_level}
     headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token}
-    print(url + _id)
+    print(json.dumps(payload, indent=4, ensure_ascii=False))
     response = requests.request("PUT", url + _id, headers=headers, data=json.dumps(payload))
-    print(response.text)
+    print(json.dumps(json.loads(response.text), indent=4))
     return json.loads(response.text)
 
 def create_user(token, first_name, last_name, email, password, access_level, url="http://localhost:8080/api/users/"):
     payload = {'first_name': first_name, 'last_name': last_name, 'email': email, 'password': password, 'access_level': access_level}
     headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token}
+    print(json.dumps(payload, indent=4, ensure_ascii=False))
     response = requests.request("POST", url, headers=headers, data=json.dumps(payload))
-    print(response.text)
+    print(json.dumps(json.loads(response.text), indent=4))
     return json.loads(response.text)
 
 def delete_me(token, url="http://localhost:8080/api/users/"):
     headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token}
     response = requests.request("DELETE", url, headers=headers)
-    print(response.text)
+    print(json.dumps(json.loads(response.text), indent=4))
     return response.text
 
 def delete_admin(token, _id, url="http://localhost:8080/api/users/"):
     headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token}
     response = requests.request("DELETE", url + _id, headers=headers)
-    print(response.text)
+    print(json.dumps(json.loads(response.text), indent=4))
     return response.text
 
 def get_one_user(token, _id, url="http://localhost:8080/api/users/"):
     headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token}
     response = requests.request("GET", url + _id, headers=headers)
-    print(response.text)
+    print(json.dumps(json.loads(response.text), indent=4))
     return json.loads(response.text)
 
 def get_many_users(token, first_name, last_name, email, access_level, access_level_cmp, page =1, size=20, url="http://localhost:8080/api/users/"):
@@ -101,7 +107,8 @@ def get_many_users(token, first_name, last_name, email, access_level, access_lev
     if query_string == "?":
         query_string = ""
     response = requests.request("GET", url + query_string, headers=headers)
-    print(response.text)
+    print(query_string)
+    print(json.dumps(json.loads(response.text), indent=4))
     return json.loads(response.text)
 # signup("test", "test", "test@test.com", "testtest")
 # tokens = signin("test@test.com", "testtest")
@@ -113,7 +120,7 @@ def get_many_users(token, first_name, last_name, email, access_level, access_lev
 # signout(tokens['access_token'], tokens['refresh_token'])
 # refresh(tokens['access_token'], tokens['refresh_token'])
 
-#create 10 random users with access_level 1
+# create 10 random users with access_level 1
 tokens = signin("test@test.com", "testtest")
 
 for i in range(10):
@@ -125,7 +132,7 @@ print(json.dumps(users, indent=4))
 tokens = refresh(tokens['access_token'], tokens['refresh_token'])
 #update created users
 for i in range(10):
-    update_admin(tokens['access_token'], users["data"]["data"][i]["_id"]["$oid"], "test" + str(i * 2), "test" + str(i * 2), "test" + str(i + 100) + "@test.com", "testtest", 1)
+    update_admin(tokens['access_token'], users["data"]["data"][i]["_id"]["$oid"], "test" + str(i * 2), "test" + str(i * 2), "test" + str(i + 100) + "@test.com", "testtest", access_level=2000)
     tokens = refresh(tokens['access_token'], tokens['refresh_token'])
 
 #delete created users
@@ -164,9 +171,31 @@ print("deleting user")
 delete_admin(tokens['access_token'], user_acc["data"]["data"][0]["_id"]["$oid"])
 print("user deleted")
 tokens = refresh(tokens['access_token'], tokens['refresh_token'])
-
+delete_admin(tokens['access_token'], user_acc["data"]["data"][0]["_id"]["$oid"])
+tokens = refresh(tokens['access_token'], tokens['refresh_token'])
+get_one_user(tokens['access_token'], user_acc["data"]["data"][0]["_id"]["$oid"])
+tokens = refresh(tokens['access_token'], tokens['refresh_token'])
 print("test delete")
 update_me(user_tokens['access_token'], "test", "test", "", "")
 
 
 signout(tokens['access_token'], tokens['refresh_token'])
+
+
+# signup("test", "test", "test@test.com", "testtest")
+# signup("test", "test", "test_badmail.com", "testtest")
+# signup("test", "test", "testtesttest@test.com", "shortp")
+# signup("test", "test", "testttseqwettt@test.com", "testtest")
+
+
+# signin("nono@nono.com", "nonononononono")
+# tokens = signin("test@test.com", "testtest")
+
+# get_many_users(tokens['access_token'], "", "", "", 1, 0, 1, 10)
+
+# tokens = refresh(tokens['access_token'], tokens['refresh_token'])
+
+# signout(tokens['access_token'], tokens['refresh_token'])
+# signout(tokens['access_token'], tokens['refresh_token'])
+
+
