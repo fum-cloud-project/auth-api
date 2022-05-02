@@ -28,9 +28,14 @@ pub fn get_create_schema() -> Value {
                 "first_name": {
                     "description": "User's last name",
                     "type": "string"
+                },
+                "access_level": {
+                    "description" : "User's access level",
+                    "type" : "integer",
+                    "minimum" : 0
                 }
             },
-            "required": [ "email", "password", "first_name", "last_name"]
+            "required": [ "email", "password", "first_name", "last_name", "access_level"]
         }
     )
 }
