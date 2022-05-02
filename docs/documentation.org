@@ -821,3 +821,17 @@ pub struct UserFilter {
     ]
 }
     #+END_SRC
+
+* GRPC server
+** Protocol
+    You can find .proto file in projects root inside proto folder. What each message represents is pretty self explanatory.
+*** HasAccess
+- note_1: this call consumes the token and it won't be valid afterwards
+- note_2: Error with invalid_argument status will be returned upon bad path or method
+- note_3: Upon internal server error status will be equal to internal
+- params:
+  - method mus be chosen from Method enum
+  - path must have this format "/path/to/something" or "/{name_of_path_param}/rest/of/path/endpoint"
+*** GetUser
+- note_1: this call won't consume the token and it will be valid afterwards
+- note_2: invalid argument will be returned upon bad jwt

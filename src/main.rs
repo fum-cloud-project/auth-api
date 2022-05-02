@@ -3,6 +3,8 @@ extern crate actix;
 extern crate dotenv_codegen;
 #[macro_use]
 extern crate serde;
+#[macro_use]
+extern crate lazy_static;
 
 mod actors;
 mod api_handlers;
@@ -27,9 +29,30 @@ use bootstrap_utils::add_resources::add_resources;
 //external modules
 use actix::Actor;
 use actix_cors::Cors;
+use actix_files::NamedFile;
 use actix_web::middleware::Logger;
-use actix_web::{http, web::Data, App, HttpServer};
+use actix_web::{get, http, web::Data, App, HttpServer};
 use mongodb::{options::ClientOptions, Client};
+
+lazy_static! {
+    static ref DOCS: std::path::PathBuf = {
+        let path = dotenv!("DOCS_PATH");
+        std::path::PathBuf::from(path)
+    };
+}
+
+#[get("/")]
+async fn index_with() -> NamedFile {
+    println!("hey");
+    NamedFile::open_async(DOCS.clone()).await.unwrap()
+}
+
+#[get("")]
+async fn index() -> NamedFile {
+    println!("hey");
+    NamedFile::open_async(DOCS.clone()).await.unwrap()
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let db_url = dotenv!("DATABASE_URL");
@@ -94,6 +117,11 @@ async fn main() -> std::io::Result<()> {
                             .service(get_many)
                             .service(delete)
                             .service(delete_admin),
+                    )
+                    .service(
+                        actix_web::web::scope("/docs")
+                            .service(index)
+                            .service(index_with),
                     ),
             )
             .app_data(Data::new(AppState {

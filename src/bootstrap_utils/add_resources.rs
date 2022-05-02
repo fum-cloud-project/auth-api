@@ -183,5 +183,21 @@ pub async fn add_resources(db: Addr<DbActor>) -> Result<(), ()> {
             return Err(());
         }
     }
+    match db
+        .send(CreateOrUpdateResource {
+            path: format!("/api/docs"),
+            access: 0,
+            method: Method::GET,
+        })
+        .await
+    {
+        Ok(Ok(_)) => {
+            info!("Added GET /api/docs")
+        }
+        _ => {
+            error!("Adding to DB failed!");
+            return Err(());
+        }
+    }
     Ok(())
 }

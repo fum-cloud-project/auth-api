@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2022-05-02 Mon 15:01 -->
+<!-- 2022-05-02 Mon 15:31 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Auth and user management documentation</title>
@@ -204,29 +204,39 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orga0a05d0">1. Auth endpoint</a>
+<li><a href="#orgaa49b3b">1. Auth endpoint</a>
 <ul>
-<li><a href="#orgeb32082">1.1. Description</a>
+<li><a href="#orgc21c745">1.1. Description</a>
 <ul>
-<li><a href="#org1e688e3">1.1.1. sign_in</a></li>
-<li><a href="#org79571cc">1.1.2. sign_up</a></li>
-<li><a href="#org12ed3a1">1.1.3. sign_out</a></li>
-<li><a href="#org207d571">1.1.4. refresh</a></li>
+<li><a href="#org96f61fe">1.1.1. sign_in</a></li>
+<li><a href="#org1c31462">1.1.2. sign_up</a></li>
+<li><a href="#orgd915aab">1.1.3. sign_out</a></li>
+<li><a href="#org5512296">1.1.4. refresh</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org5447b03">2. Users endpoint</a>
+<li><a href="#orgd5ce597">2. Users endpoint</a>
 <ul>
-<li><a href="#org6e383a2">2.1. Description</a>
+<li><a href="#org7a46515">2.1. Description</a>
 <ul>
-<li><a href="#orgfd80d3e">2.1.1. Create a user (admin)</a></li>
-<li><a href="#orged2a230">2.1.2. Delete account (normal user)</a></li>
-<li><a href="#org0fe8010">2.1.3. Delete user (admin)</a></li>
-<li><a href="#org5706904">2.1.4. Update account (normal user)</a></li>
-<li><a href="#org03476c1">2.1.5. Update user (admin)</a></li>
-<li><a href="#orgfe1fdfe">2.1.6. Get users (admin)</a></li>
-<li><a href="#org13794d2">2.1.7. Get one user (admin)</a></li>
+<li><a href="#orgcda4d2b">2.1.1. Create a user (admin)</a></li>
+<li><a href="#orgbc076c3">2.1.2. Delete account (normal user)</a></li>
+<li><a href="#org4ae196f">2.1.3. Delete user (admin)</a></li>
+<li><a href="#org6889a01">2.1.4. Update account (normal user)</a></li>
+<li><a href="#orga6ae96a">2.1.5. Update user (admin)</a></li>
+<li><a href="#org7538333">2.1.6. Get users (admin)</a></li>
+<li><a href="#org79abc5b">2.1.7. Get one user (admin)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org0aa84df">3. GRPC server</a>
+<ul>
+<li><a href="#org3ea7a11">3.1. Protocol</a>
+<ul>
+<li><a href="#org7961a6f">3.1.1. HasAccess</a></li>
+<li><a href="#org3d2eada">3.1.2. GetUser</a></li>
 </ul>
 </li>
 </ul>
@@ -236,20 +246,20 @@
 </div>
 
 
-<div id="outline-container-orga0a05d0" class="outline-2">
-<h2 id="orga0a05d0"><span class="section-number-2">1.</span> Auth endpoint</h2>
+<div id="outline-container-orgaa49b3b" class="outline-2">
+<h2 id="orgaa49b3b"><span class="section-number-2">1.</span> Auth endpoint</h2>
 <div class="outline-text-2" id="text-1">
 </div>
-<div id="outline-container-orgeb32082" class="outline-3">
-<h3 id="orgeb32082"><span class="section-number-3">1.1.</span> Description</h3>
+<div id="outline-container-orgc21c745" class="outline-3">
+<h3 id="orgc21c745"><span class="section-number-3">1.1.</span> Description</h3>
 <div class="outline-text-3" id="text-1-1">
 <p>
 Using these endpoints users can create an account, sing in into their account, sign out and revoke their tokens and finally refresh their used access_token. We implement a simple access model, each resource a.k.a (path, method) tuple has an integer access level, each user also has an integer access level, users can access resources with lower access level than their own access level.
 On a successful sign in user receives two tokens, one for accessing resources with access level higher than 0, and another for refreshing expired or used access token. Each token regardless of its type can only be used once. After a successful refresh user receives a brand new token couple. Access tokens expire within 10 seconds and Refresh tokens expire within a day. Users have to re-login on refresh token expiration.
 </p>
 </div>
-<div id="outline-container-org1e688e3" class="outline-4">
-<h4 id="org1e688e3"><span class="section-number-4">1.1.1.</span> sign_in</h4>
+<div id="outline-container-org96f61fe" class="outline-4">
+<h4 id="org96f61fe"><span class="section-number-4">1.1.1.</span> sign_in</h4>
 <div class="outline-text-4" id="text-1-1-1">
 <ul class="org-ul">
 <li>path: /api/auth/sign_in</li>
@@ -333,8 +343,8 @@ response:
 </div>
 </div>
 
-<div id="outline-container-org79571cc" class="outline-4">
-<h4 id="org79571cc"><span class="section-number-4">1.1.2.</span> sign_up</h4>
+<div id="outline-container-org1c31462" class="outline-4">
+<h4 id="org1c31462"><span class="section-number-4">1.1.2.</span> sign_up</h4>
 <div class="outline-text-4" id="text-1-1-2">
 <ul class="org-ul">
 <li>path: /api/auth/sign_up</li>
@@ -455,8 +465,8 @@ response:
 </div>
 </div>
 
-<div id="outline-container-org12ed3a1" class="outline-4">
-<h4 id="org12ed3a1"><span class="section-number-4">1.1.3.</span> sign_out</h4>
+<div id="outline-container-orgd915aab" class="outline-4">
+<h4 id="orgd915aab"><span class="section-number-4">1.1.3.</span> sign_out</h4>
 <div class="outline-text-4" id="text-1-1-3">
 <ul class="org-ul">
 <li>path: /api/auth/sign_in</li>
@@ -534,8 +544,8 @@ response:
 </div>
 
 
-<div id="outline-container-org207d571" class="outline-4">
-<h4 id="org207d571"><span class="section-number-4">1.1.4.</span> refresh</h4>
+<div id="outline-container-org5512296" class="outline-4">
+<h4 id="org5512296"><span class="section-number-4">1.1.4.</span> refresh</h4>
 <div class="outline-text-4" id="text-1-1-4">
 <ul class="org-ul">
 <li>note : Users can not use this endpoint prior to access token expiration.</li>
@@ -589,19 +599,19 @@ response:
 </div>
 </div>
 </div>
-<div id="outline-container-org5447b03" class="outline-2">
-<h2 id="org5447b03"><span class="section-number-2">2.</span> Users endpoint</h2>
+<div id="outline-container-orgd5ce597" class="outline-2">
+<h2 id="orgd5ce597"><span class="section-number-2">2.</span> Users endpoint</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-org6e383a2" class="outline-3">
-<h3 id="org6e383a2"><span class="section-number-3">2.1.</span> Description</h3>
+<div id="outline-container-org7a46515" class="outline-3">
+<h3 id="org7a46515"><span class="section-number-3">2.1.</span> Description</h3>
 <div class="outline-text-3" id="text-2-1">
 <p>
 Some of these endpoints are only available to admin. Users can update their account, actions like changing their email, password or name and last_name. Admins can retrieve list of users, filter them, or get one specific user by their ID. Admins can also update or delete users accounts.
 </p>
 </div>
-<div id="outline-container-orgfd80d3e" class="outline-4">
-<h4 id="orgfd80d3e"><span class="section-number-4">2.1.1.</span> Create a user (admin)</h4>
+<div id="outline-container-orgcda4d2b" class="outline-4">
+<h4 id="orgcda4d2b"><span class="section-number-4">2.1.1.</span> Create a user (admin)</h4>
 <div class="outline-text-4" id="text-2-1-1">
 <ul class="org-ul">
 <li>note : admins can not create users with higher access level than theirs</li>
@@ -706,8 +716,8 @@ response:
 </ul>
 </div>
 </div>
-<div id="outline-container-orged2a230" class="outline-4">
-<h4 id="orged2a230"><span class="section-number-4">2.1.2.</span> Delete account (normal user)</h4>
+<div id="outline-container-orgbc076c3" class="outline-4">
+<h4 id="orgbc076c3"><span class="section-number-4">2.1.2.</span> Delete account (normal user)</h4>
 <div class="outline-text-4" id="text-2-1-2">
 <ul class="org-ul">
 <li>note: Deletes requesting user&rsquo;s account</li>
@@ -747,8 +757,8 @@ response:
 </div>
 
 
-<div id="outline-container-org0fe8010" class="outline-4">
-<h4 id="org0fe8010"><span class="section-number-4">2.1.3.</span> Delete user (admin)</h4>
+<div id="outline-container-org4ae196f" class="outline-4">
+<h4 id="org4ae196f"><span class="section-number-4">2.1.3.</span> Delete user (admin)</h4>
 <div class="outline-text-4" id="text-2-1-3">
 <ul class="org-ul">
 <li>note: Deletes requesting user&rsquo;s account</li>
@@ -805,8 +815,8 @@ response:
 </div>
 </div>
 
-<div id="outline-container-org5706904" class="outline-4">
-<h4 id="org5706904"><span class="section-number-4">2.1.4.</span> Update account (normal user)</h4>
+<div id="outline-container-org6889a01" class="outline-4">
+<h4 id="org6889a01"><span class="section-number-4">2.1.4.</span> Update account (normal user)</h4>
 <div class="outline-text-4" id="text-2-1-4">
 <ul class="org-ul">
 <li>note: Updates requesting user&rsquo;s account</li>
@@ -912,8 +922,8 @@ response:
 </div>
 
 
-<div id="outline-container-org03476c1" class="outline-4">
-<h4 id="org03476c1"><span class="section-number-4">2.1.5.</span> Update user (admin)</h4>
+<div id="outline-container-orga6ae96a" class="outline-4">
+<h4 id="orga6ae96a"><span class="section-number-4">2.1.5.</span> Update user (admin)</h4>
 <div class="outline-text-4" id="text-2-1-5">
 <ul class="org-ul">
 <li>note: Admins can not promote users to higher access level than theirs.</li>
@@ -1085,8 +1095,8 @@ response:
 </div>
 </div>
 
-<div id="outline-container-orgfe1fdfe" class="outline-4">
-<h4 id="orgfe1fdfe"><span class="section-number-4">2.1.6.</span> Get users (admin)</h4>
+<div id="outline-container-org7538333" class="outline-4">
+<h4 id="org7538333"><span class="section-number-4">2.1.6.</span> Get users (admin)</h4>
 <div class="outline-text-4" id="text-2-1-6">
 <ul class="org-ul">
 <li>note: Gets users accounts filtered by query params</li>
@@ -1279,8 +1289,8 @@ response:
 </div>
 
 
-<div id="outline-container-org13794d2" class="outline-4">
-<h4 id="org13794d2"><span class="section-number-4">2.1.7.</span> Get one user (admin)</h4>
+<div id="outline-container-org79abc5b" class="outline-4">
+<h4 id="org79abc5b"><span class="section-number-4">2.1.7.</span> Get one user (admin)</h4>
 <div class="outline-text-4" id="text-2-1-7">
 <ul class="org-ul">
 <li>path: /api/users/{id}</li>
@@ -1351,10 +1361,48 @@ response:
 </div>
 </div>
 </div>
+
+<div id="outline-container-org0aa84df" class="outline-2">
+<h2 id="org0aa84df"><span class="section-number-2">3.</span> GRPC server</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org3ea7a11" class="outline-3">
+<h3 id="org3ea7a11"><span class="section-number-3">3.1.</span> Protocol</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+You can find .proto file in projects root inside proto folder. What each message represents is pretty self explanatory.
+</p>
+</div>
+<div id="outline-container-org7961a6f" class="outline-4">
+<h4 id="org7961a6f"><span class="section-number-4">3.1.1.</span> HasAccess</h4>
+<div class="outline-text-4" id="text-3-1-1">
+<ul class="org-ul">
+<li>note_1: this call consumes the token and it won&rsquo;t be valid afterwards</li>
+<li>note_2: Error with invalid_argument status will be returned upon bad path or method</li>
+<li>note_3: Upon internal server error status will be equal to internal</li>
+<li>params:
+<ul class="org-ul">
+<li>method mus be chosen from Method enum</li>
+<li>path must have this format &ldquo;/path/to/something&rdquo; or &ldquo;/{name_of_path_param}/rest/of/path/endpoint&rdquo;</li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org3d2eada" class="outline-4">
+<h4 id="org3d2eada"><span class="section-number-4">3.1.2.</span> GetUser</h4>
+<div class="outline-text-4" id="text-3-1-2">
+<ul class="org-ul">
+<li>note_1: this call won&rsquo;t consume the token and it will be valid afterwards</li>
+<li>note_2: invalid argument will be returned upon bad jwt</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Tooraj Taraz</p>
-<p class="date">Created: 2022-05-02 Mon 15:01</p>
+<p class="date">Created: 2022-05-02 Mon 15:31</p>
 </div>
 </body>
 </html>
