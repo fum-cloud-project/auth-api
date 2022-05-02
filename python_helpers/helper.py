@@ -145,4 +145,28 @@ for user in users["data"]["data"]:
     delete_admin(tokens['access_token'], user["_id"]["$oid"])
     tokens = refresh(tokens['access_token'], tokens['refresh_token'])
 
+
+#create a user and sign in with it then delete the user and test login tokens they should fail
+print("\n\n\n")
+print("create a user and sign in with it then delete the user and test login tokens they should fail")
+print("creating user")
+create_user(tokens['access_token'], "test", "test", "testaccdelete@delete.com", "testtest", 1)
+print("user created")
+print("signing in")
+user_tokens = signin("testaccdelete@delete.com", "testtest")
+print("user signed in")
+tokens = refresh(tokens['access_token'], tokens['refresh_token'])
+print("retrieving user")
+user_acc = get_many_users(tokens['access_token'], "", "", "", 1, 0, 1, 10)
+print("user retrieved")
+tokens = refresh(tokens['access_token'], tokens['refresh_token'])
+print("deleting user")
+delete_admin(tokens['access_token'], user_acc["data"]["data"][0]["_id"]["$oid"])
+print("user deleted")
+tokens = refresh(tokens['access_token'], tokens['refresh_token'])
+
+print("test delete")
+update_me(user_tokens['access_token'], "test", "test", "", "")
+
+
 signout(tokens['access_token'], tokens['refresh_token'])
