@@ -7,12 +7,17 @@ use crate::utils::validations::validate;
 use actix_web::{
     post,
     web::{Data, Json},
-    HttpResponse, Responder,
+    HttpMessage, HttpRequest, HttpResponse, Responder,
 };
 use serde_json::json;
 
 #[post("/")]
-pub async fn create(user: Json<UserDataCreate>, state: Data<AppState>) -> impl Responder {
+pub async fn create(
+    req: HttpRequest,
+    user: Json<UserDataCreate>,
+    state: Data<AppState>,
+) -> impl Responder {
+    let user_access_level: i32 = req.extensions().get::<i32>().unwrap().to_owned();
     let db = state.as_ref().db.clone();
     let salt = &state.as_ref().salt;
     let salt = salt.to_string();
@@ -27,6 +32,13 @@ pub async fn create(user: Json<UserDataCreate>, state: Data<AppState>) -> impl R
         Ok(_) => {}
         Err(e) => {
             return HttpResponse::BadRequest().json(json!({ "issues": e }));
+        }
+    }
+    if let Some(access_level) = user.access_level {
+        if access_level > user_access_level {
+            return HttpResponse::Unauthorized().json(
+                json!({ "issues": ["You can not create a user with higher access level than yours"] }),
+            );
         }
     }
     let hashed_password = match hash_password(salt, user.password.unwrap()) {
