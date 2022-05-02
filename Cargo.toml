@@ -38,6 +38,6 @@ actix-web-httpauth = "0.6.0"
 tonic = { version = "0.7", features = ["compression", "prost"] }
 prost = "0.10"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-
+actix-cors = "0.6.1"
 [build-dependencies]
 tonic-build = { version = "0.7", features = ["compression"]}
