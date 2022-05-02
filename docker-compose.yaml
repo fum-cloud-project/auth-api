@@ -1,0 +1,73 @@
+version: "3.4"
+services:
+  auth_api_server:
+    container_name: "auth_api_server"
+    build:
+      context: .
+      dockerfile: "Dockerfile.api"
+      cache_from:
+        - rust:latest
+    restart: on-failure
+    links:
+      - "mongodb_auth"
+      - "redis_auth"
+    depends_on:
+      - "mongodb_auth"
+      - "redis_auth"
+    networks:
+      - rusty_net
+    tty: true
+    ports:
+      - "8080:8080"
+
+  auth_grpc_server:
+    container_name: "auth_grpc_server"
+    build:
+      context: .
+      dockerfile: "Dockerfile.grpc"
+      cache_from:
+        - rust:latest
+    restart: on-failure
+    links:
+      - "mongodb_auth"
+      - "redis_auth"
+    depends_on:
+      - "mongodb_auth"
+      - "redis_auth"
+    networks:
+      - rusty_net
+    tty: true
+    ports:
+      - "50051:50051"
+  redis_auth:
+    image: redis:latest
+    restart: always
+    volumes:
+      - redis_data:/data
+    networks:
+      - rusty_net
+    ports:
+      - "6379:6379"
+
+  mongodb_auth:
+    image: mongo:latest
+    restart: always
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "clouddev"
+      MONGO_INITDB_ROOT_PASSWORD: "12345678"
+    networks:
+      - rusty_net
+    ports:
+      - "27017:27017"
+
+networks:
+  rusty_net:
+    driver: bridge
+
+volumes:
+  redis_data:
+    external: false
+  mongodb_data:
+      driver: local
