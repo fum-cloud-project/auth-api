@@ -27,7 +27,7 @@ pub async fn delete(req: HttpRequest, state: Data<AppState>) -> impl Responder {
     }
     match db.send(DeleteUser { _id: id }).await {
         Ok(Ok(Ok(_))) => HttpResponse::Ok().json(json!({
-            "message": "User was deleted successfully"
+            "message": "Your account was deleted successfully"
         })),
         Ok(Err(e)) => HttpResponse::BadRequest().json(json!({ "message": e })),
         _ => HttpResponse::InternalServerError().json(json!({

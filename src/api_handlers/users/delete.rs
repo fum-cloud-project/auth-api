@@ -39,7 +39,7 @@ pub async fn delete_admin(id: Path<(String,)>, state: Data<AppState>) -> impl Re
         Ok(Ok(Ok(_))) => HttpResponse::Ok().json(json!({
             "message": "User was deleted successfully"
         })),
-        Ok(Err(e)) => HttpResponse::BadRequest().json(json!({ "message": e })),
+        Ok(Err(e)) => HttpResponse::NotFound().json(json!({ "issues": [e], })),
         _ => HttpResponse::InternalServerError().json(json!({
             "issues" : ["something went wrong"]
         })),
