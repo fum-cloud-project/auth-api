@@ -46,7 +46,7 @@ pub async fn get_many(filter: Query<UserFilter>, state: Data<AppState>) -> impl 
         })
         .await
     {
-        Ok(c) => c,
+        Ok(Ok(c)) => c,
         _ => {
             return HttpResponse::InternalServerError().json(json!({
                     "issues" : ["something went wrong"],
