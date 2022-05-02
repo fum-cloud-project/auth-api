@@ -2,3 +2,822 @@
 #+AUTHOR: Tooraj Taraz
 #+OPTIONS: ^:nil _:nil
 #+SETUPFILE: ~/.doom.d/retro-dark.theme
+
+
+* Auth endpoint
+** Description
+Using these endpoints users can create an account, sing in into their account, sign out and revoke their tokens and finally refresh their used access_token. We implement a simple access model, each resource a.k.a (path, method) tuple has an integer access level, each user also has an integer access level, users can access resources with lower access level than their own access level.
+On a successful sign in user receives two tokens, one for accessing resources with access level higher than 0, and another for refreshing expired or used access token. Each token regardless of its type can only be used once. After a successful refresh user receives a brand new token couple. Access tokens expire within 10 seconds and Refresh tokens expire within a day. Users have to re-login on refresh token expiration.
+*** sign_in
+- path: /api/auth/sign_in
+- method: POST
+- content-type: application/json
+- validation schema:
+  #+BEGIN_SRC json
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://cloud.project/signin.schema.json",
+    "title": "SignIn",
+    "description": "Sign in form",
+    "type": "object",
+    "properties": {
+        "email": {
+            "description": "User's email",
+            "type": "string",
+            "format": "email"
+        },
+        "password": {
+            "description": "User's password",
+            "type": "string",
+                "minLength": 8,
+                "maxLength": 128
+        }
+    },
+    "required": [ "email", "password" ]
+}
+  #+END_SRC
+- example 401:
+  - body:
+    #+BEGIN_SRC json
+{
+    "email": "nono@nono.com",
+    "password": "nonononononono"
+}
+    #+END_SRC
+  - response:
+    #+BEGIN_SRC json
+{
+    "issues": [
+        "wrong password or email"
+    ]
+}
+    #+END_SRC
+- example 200:
+  - body:
+    #+BEGIN_SRC json
+{
+    "email": "test@test.com",
+    "password": "testtest"
+}
+    #+END_SRC
+  - response:
+    #+BEGIN_SRC json
+{
+    "access_token": "token_for_access",
+    "refresh_token": "token_for_refresh"
+}
+    #+END_SRC
+
+*** sign_up
+- path: /api/auth/sign_up
+- method: POST
+- content-type: application/json
+- validation schema:
+  #+BEGIN_SRC json
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://cloud.project/signup.schema.json",
+    "title": "SignUp",
+    "description": "Sign up form",
+    "type": "object",
+    "properties": {
+        "email": {
+            "description": "User's email",
+            "type": "string",
+            "format": "email"
+        },
+        "password": {
+            "description": "User's password",
+            "type": "string",
+                "minLength": 8,
+                "maxLength": 128
+        },
+        "first_name": {
+            "description": "User's name",
+            "type": "string"
+        },
+        "first_name": {
+            "description": "User's last name",
+            "type": "string"
+        }
+    },
+    "required": [ "email", "password", "first_name", "last_name"]
+}
+  #+END_SRC
+- example 400:
+  - body:
+    #+BEGIN_SRC json
+{
+    "first_name": "test",
+    "last_name": "test",
+    "email": "test@test.com",
+    "password": "testtest"
+}
+    #+END_SRC
+  - response:
+    #+BEGIN_SRC json
+{
+    "issues": [
+        "User already exists."
+    ]
+}
+    #+END_SRC
+- example 400:
+  - body:
+    #+BEGIN_SRC json
+{
+    "first_name": "test",
+    "last_name": "test",
+    "email": "test_badmail.com",
+    "password": "testtest"
+}
+    #+END_SRC
+  - response:
+    #+BEGIN_SRC json
+{
+    "issues": [
+        "\"test_badmail.com\" is not a \"email\""
+    ]
+}
+    #+END_SRC
+- example 200:
+  - body:
+    #+BEGIN_SRC json
+{
+    "first_name": "test",
+    "last_name": "test",
+    "email": "testttseqwettt@test.com",
+    "password": "testtest"
+}
+    #+END_SRC
+  - response:
+    #+BEGIN_SRC json
+{
+    "message": "Your account was created successfully, use login api to get auth token"
+}
+    #+END_SRC
+
+*** sign_out
+- path: /api/auth/sign_in
+- method: POST
+- header: Authorization Bearer <access_token>
+- content-type: application/json
+- validation schema:
+  #+BEGIN_SRC json
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://cloud.project/signout.schema.json",
+    "title": "SignOut",
+    "description": "Sign out form",
+    "type": "object",
+    "properties": {
+        "refresh_token": {
+            "description": "User's valid refresh token",
+            "type": "string",
+        },
+    },
+    "required": [ "refresh_token" ]
+}
+  #+END_SRC
+- example 401:
+  - invalid token within header
+  - body:
+    #+BEGIN_SRC json
+{
+    "refresh_token": "refresh_token"
+}
+    #+END_SRC
+  - response:
+    #+BEGIN_SRC json
+{
+    "issues": [
+        "You don't have access to this resource"
+    ]
+}
+    #+END_SRC
+- example 200:
+  - valid token in header and body
+  - body:
+    #+BEGIN_SRC json
+{
+    "refresh_token": "refresh_token"
+}
+    #+END_SRC
+  - response:
+    #+BEGIN_SRC json
+{
+    "Message": "Sing out was successful."
+}
+    #+END_SRC
+
+
+*** refresh
+- note : Users can not use this endpoint prior to access token expiration.
+- path: /api/auth/refresh
+- method: POST
+- content-type: application/json
+- validation schema:
+  #+BEGIN_SRC json
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://cloud.project/refresh.schema.json",
+    "title": "Refresh",
+    "description": "Refresh token form",
+    "type": "object",
+    "properties": {
+        "refresh_token": {
+            "description": "User's valid refresh token",
+            "type": "string",
+        },
+    },
+    "required": [ "refresh_token" ]
+}
+  #+END_SRC
+- example 200:
+  - body:
+    #+BEGIN_SRC json
+{
+    "refresh_token": "refresh_token"
+}
+    #+END_SRC
+  - response:
+    #+BEGIN_SRC json
+{
+    "access_token": "token_for_access",
+    "refresh_token": "token_for_refresh"
+}
+    #+END_SRC
+* Users endpoint
+** Description
+Some of these endpoints are only available to admin. Users can update their account, actions like changing their email, password or name and last_name. Admins can retrieve list of users, filter them, or get one specific user by their ID. Admins can also update or delete users accounts.
+*** Create a user (admin)
+- note : admins can not create users with higher access level than theirs
+- path: /api/users
+- method: POST
+- header: Authorization Bearer <access_token>
+- content-type: application/json
+- validation schema:
+  #+BEGIN_SRC json
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://cloud.project/create.schema.json",
+    "title": "Create",
+    "description": "Admin's Create user form",
+    "type": "object",
+    "properties": {
+        "email": {
+            "description": "User's email",
+            "type": "string",
+            "format": "email"
+        },
+        "password": {
+            "description": "User's password",
+            "type": "string",
+                "minLength": 8,
+                "maxLength": 128
+        },
+        "first_name": {
+            "description": "User's name",
+            "type": "string"
+        },
+        "first_name": {
+            "description": "User's last name",
+            "type": "string"
+        },
+        "access_level": {
+            "description" : "User's access level",
+            "type" : "integer",
+            "minimum" : 0
+        }
+    },
+    "required": [ "email", "password", "first_name", "last_name", "access_level"]
+}
+  #+END_SRC
+- example 401:
+  - invalid token within header or user with non admin access level
+  - body:
+    #+BEGIN_SRC json
+{
+    "first_name": "test18",
+    "last_name": "test18",
+    "email": "test109@test.com",
+    "password": "testtest",
+    "access_level": 1
+}
+    #+END_SRC
+  - response:
+    #+BEGIN_SRC json
+{
+    "issues": [
+        "You don't have access to this resource"
+    ]
+}
+    #+END_SRC
+- example 200:
+  - valid token in header with admin access level
+  - body:
+    #+BEGIN_SRC json
+{
+    "first_name": "test16",
+    "last_name": "test16",
+    "email": "test108@test.com",
+    "password": "testtest",
+    "access_level": 1
+}
+    #+END_SRC
+  - response:
+    #+BEGIN_SRC json
+{
+    "message": "User was created successfully"
+}
+    #+END_SRC
+*** Delete account (normal user)
+- note: Deletes requesting user's account
+- path: /api/users
+- method: DELETE
+- header: Authorization Bearer <access_token>
+- example 401:
+  - invalid token within header
+  - response:
+    #+BEGIN_SRC json
+{
+    "issues": [
+        "You don't have access to this resource"
+    ]
+}
+    #+END_SRC
+- example 200:
+  - valid token in header with normal user access level
+  - response:
+    #+BEGIN_SRC json
+{
+    "message": "Your account was deleted successfully"
+}
+    #+END_SRC
+
+
+*** Delete user (admin)
+- note: Deletes requesting user's account
+- path: /api/users/{id}
+- path_params:
+  - id: valid ObjectId string
+- method: DELETE
+- header: Authorization Bearer <access_token>
+- example 401:
+  - invalid token within header
+  - response:
+    #+BEGIN_SRC json
+{
+    "issues": [
+        "You don't have access to this resource"
+    ]
+}
+    #+END_SRC
+- example 404:
+  - valid token in header with admin access level
+  - valid id, but non existent
+  - response:
+    #+BEGIN_SRC json
+{
+    "message": "User does not exist."
+}
+    #+END_SRC
+- example 200:
+  - valid token in header with admin access level
+  - response:
+    #+BEGIN_SRC json
+{
+    "message": "User was deleted successfully"
+}
+    #+END_SRC
+
+*** Update account (normal user)
+- note: Updates requesting user's account
+- path: /api/users
+- method: PUT
+- header: Authorization Bearer <access_token>
+- content-type: application/json
+- validation schema:
+  #+BEGIN_SRC json
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://cloud.project/update.schema.json",
+    "title": "Create",
+    "description": "Admin's Create user form",
+    "type": "object",
+    "properties": {
+        "email": {
+            "description": "User's email",
+            "type": "string",
+            "format": "email"
+        },
+        "first_name": {
+            "description": "User's name",
+            "type": "string"
+        },
+        "password": {
+            "description": "User's password",
+            "type": "string",
+                "minLength": 8,
+                "maxLength": 128
+        },
+        "first_name": {
+            "description": "User's last name",
+            "type": "string"
+        }
+    },
+    "anyOf" : [
+        {"required": [ "email" ]},
+        {"required": [ "password" ]},
+        {"required": [ "first_name" ]},
+        {"required": [ "last_name"]},
+    ]
+}
+  #+END_SRC
+- example 401:
+  - invalid token within header
+  - body:
+    #+BEGIN_SRC json
+{
+    "first_name": "test16",
+    "last_name": "test16",
+    "email": "test108@test.com",
+    "password": "testtest",
+}
+    #+END_SRC
+  - response:
+    #+BEGIN_SRC json
+{
+    "issues": [
+        "You don't have access to this resource"
+    ]
+}
+    #+END_SRC
+- example 200:
+  - valid token in header with normal user access level
+  - provided email does not already exist in the DB
+  - body:
+    #+BEGIN_SRC json
+{
+    "first_name": "test16",
+    "last_name": "test16",
+    "email": "test108@test.com",
+    "password": "testtest",
+}
+    #+END_SRC
+  - response:
+    #+BEGIN_SRC json
+{
+    "message": "Your account was updated successfully"
+}
+    #+END_SRC
+
+
+*** Update user (admin)
+- note: Admins can not promote users to higher access level than theirs.
+- path: /api/users/{id}
+- path_params:
+  - id: valid ObjectId string
+- method: PUT
+- header: Authorization Bearer <access_token>
+- content-type: application/json
+- validation schema:
+  #+BEGIN_SRC json
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://cloud.project/admin.update.schema.json",
+    "title": "Create",
+    "description": "Admin's Create user form",
+    "type": "object",
+    "properties": {
+        "email": {
+            "description": "User's email",
+            "type": "string",
+            "format": "email"
+        },
+        "first_name": {
+            "description": "User's name",
+            "type": "string"
+        },
+        "password": {
+            "description": "User's password",
+            "type": "string",
+                "minLength": 8,
+                "maxLength": 128
+        },
+        "first_name": {
+            "description": "User's last name",
+            "type": "string"
+        },
+        "access_level": {
+            "description" : "User's access level",
+            "type" : "integer",
+            "minimum" : 0
+        }
+    },
+    "anyOf" : [
+        {"required": [ "email" ]},
+        {"required": [ "password" ]},
+        {"required": [ "first_name" ]},
+        {"required": [ "last_name"]},
+        {"required": [ "access_level"]},
+    ]
+}
+  #+END_SRC
+- example 401:
+  - invalid token within header
+  - body:
+    #+BEGIN_SRC json
+{
+    "first_name": "test16",
+    "last_name": "test16",
+    "email": "test108@test.com",
+    "password": "testtest",
+    "access_level": 1
+}
+    #+END_SRC
+  - response:
+    #+BEGIN_SRC json
+{
+    "issues": [
+        "You don't have access to this resource"
+    ]
+}
+    #+END_SRC
+- example 400:
+  - valid token in header with admin access level
+  - body:
+    #+BEGIN_SRC json
+{
+    "first_name": "test16",
+    "last_name": "test16",
+    "email": "test108@test.com",
+    "password": "testtest",
+    "access_level": 2000
+}
+    #+END_SRC
+  - response:
+    #+BEGIN_SRC json
+{
+    "issues": [
+        "You can not promote user to higher access level than yours"
+    ]
+}
+    #+END_SRC
+- example 404:
+  - valid token in header with admin access level
+  - valid id, but non existent
+  - body:
+    #+BEGIN_SRC json
+{
+    "first_name": "test16",
+    "last_name": "test16",
+    "email": "test108@test.com",
+    "password": "testtest",
+    "access_level": 1
+}
+    #+END_SRC
+  - response:
+    #+BEGIN_SRC json
+{
+    "message": "User does not exist."
+}
+    #+END_SRC
+- example 200:
+  - valid token in header with admin access level
+  - provided email does not already exist in the DB
+  - body:
+    #+BEGIN_SRC json
+{
+    "first_name": "test16",
+    "last_name": "test16",
+    "email": "test108@test.com",
+    "password": "testtest",
+    "access_level": 2
+}
+    #+END_SRC
+  - response:
+    #+BEGIN_SRC json
+{
+    "message": "User was updated successfully"
+}
+    #+END_SRC
+
+*** Get users (admin)
+- note: Gets users accounts filtered by query params
+- path: /api/users
+- method: GET
+- query_params:
+  - Deserialized version (no query param is required, all of them are optional):
+    #+BEGIN_SRC rust
+pub struct UserFilter {
+    pub page: Option<u64>,
+    pub size: Option<u64>,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
+    pub email: Option<String>,
+    pub access_level: Option<i32>,
+    pub access_level_cmp: Option<u8>,
+}
+    #+END_SRC
+    - page : page number, defaults to 1
+    - size : page size, defaults to 20
+    - access_level_cmp : compare sign for access_level, (0 or greater than 4, ====), (1, >), (2, >=), (3, <), (4, <=)
+    - access_level : user's access level
+    - first_name : looks for any first_name that contains the param
+    - last_name : looks for any first_name that contains the param
+    - email : looks for any first_name that contains the param
+- header: Authorization Bearer <access_token>
+- example 401:
+  - invalid token within header
+  - response:
+    #+BEGIN_SRC json
+{
+    "issues": [
+        "You don't have access to this resource"
+    ]
+}
+    #+END_SRC
+- example 200:
+  - valid token in header with admin access level
+  - response:
+    #+BEGIN_SRC json
+{
+    "message": "Users retrieved successfully",
+    "data": {
+        "page": 1,
+        "total_count": 10,
+        "data": [
+            {
+                "_id": {
+                    "$oid": "626fa45c49a4b8812b87c114"
+                },
+                "first_name": "test0",
+                "last_name": "test0",
+                "email": "test100@test.com",
+                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "access_level": 1,
+                "creation_date": "2022-05-02T09:29:00.332838625Z",
+                "is_deleted": false
+            },
+            {
+                "_id": {
+                    "$oid": "626fa45c49a4b8812b87c115"
+                },
+                "first_name": "test2",
+                "last_name": "test2",
+                "email": "test101@test.com",
+                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "access_level": 1,
+                "creation_date": "2022-05-02T09:29:00.685498505Z",
+                "is_deleted": false
+            },
+            {
+                "_id": {
+                    "$oid": "626fa45d49a4b8812b87c116"
+                },
+                "first_name": "test4",
+                "last_name": "test4",
+                "email": "test102@test.com",
+                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "access_level": 1,
+                "creation_date": "2022-05-02T09:29:01.038923716Z",
+                "is_deleted": false
+            },
+            {
+                "_id": {
+                    "$oid": "626fa45d49a4b8812b87c117"
+                },
+                "first_name": "test6",
+                "last_name": "test6",
+                "email": "test103@test.com",
+                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "access_level": 1,
+                "creation_date": "2022-05-02T09:29:01.391341354Z",
+                "is_deleted": false
+            },
+            {
+                "_id": {
+                    "$oid": "626fa45d49a4b8812b87c118"
+                },
+                "first_name": "test8",
+                "last_name": "test8",
+                "email": "test104@test.com",
+                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "access_level": 1,
+                "creation_date": "2022-05-02T09:29:01.741648961Z",
+                "is_deleted": false
+            },
+            {
+                "_id": {
+                    "$oid": "626fa45e49a4b8812b87c119"
+                },
+                "first_name": "test10",
+                "last_name": "test10",
+                "email": "test105@test.com",
+                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "access_level": 1,
+                "creation_date": "2022-05-02T09:29:02.092838237Z",
+                "is_deleted": false
+            },
+            {
+                "_id": {
+                    "$oid": "626fa45e49a4b8812b87c11a"
+                },
+                "first_name": "test12",
+                "last_name": "test12",
+                "email": "test106@test.com",
+                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "access_level": 1,
+                "creation_date": "2022-05-02T09:29:02.442527442Z",
+                "is_deleted": false
+            },
+            {
+                "_id": {
+                    "$oid": "626fa45e49a4b8812b87c11b"
+                },
+                "first_name": "test14",
+                "last_name": "test14",
+                "email": "test107@test.com",
+                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "access_level": 1,
+                "creation_date": "2022-05-02T09:29:02.792700929Z",
+                "is_deleted": false
+            },
+            {
+                "_id": {
+                    "$oid": "626fa45f49a4b8812b87c11c"
+                },
+                "first_name": "test16",
+                "last_name": "test16",
+                "email": "test108@test.com",
+                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "access_level": 1,
+                "creation_date": "2022-05-02T09:29:03.143907645Z",
+                "is_deleted": false
+            },
+            {
+                "_id": {
+                    "$oid": "626fa45f49a4b8812b87c11d"
+                },
+                "first_name": "test18",
+                "last_name": "test18",
+                "email": "test109@test.com",
+                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "access_level": 1,
+                "creation_date": "2022-05-02T09:29:03.497216217Z",
+                "is_deleted": false
+            }
+        ]
+    }
+}
+    #+END_SRC
+
+
+*** Get one user (admin)
+- path: /api/users/{id}
+- path_params:
+  - id: valid ObjectId string
+- method: DELETE
+- header: Authorization Bearer <access_token>
+- example 401:
+  - invalid token within header
+  - response:
+    #+BEGIN_SRC json
+{
+    "issues": [
+        "You don't have access to this resource"
+    ]
+}
+    #+END_SRC
+- example 404:
+  - valid token in header with admin access level
+  - valid id, but non existent
+  - response:
+    #+BEGIN_SRC json
+{
+    "message": "User does not exist."
+}
+    #+END_SRC
+- example 200:
+  - valid token in header with admin access level
+  - response:
+    #+BEGIN_SRC json
+{
+    "message": "User retrieved successfully",
+    "data": [
+        {
+            "_id": {
+                "$oid": "626fa45c49a4b8812b87c114"
+            },
+            "first_name": "test0",
+            "last_name": "test0",
+            "email": "test100@test.com",
+            "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+            "access_level": 1,
+            "creation_date": "2022-05-02T09:29:00.332838625Z",
+            "is_deleted": false
+        }
+    ]
+}
+    #+END_SRC

@@ -1,0 +1,1360 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2022-05-02 Mon 15:01 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Auth and user management documentation</title>
+<meta name="author" content="Tooraj Taraz" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<style type="text/css">
+/* Base */html,body {    background-color: #222;    min-height: 100%;    line-height: 1.5;}body {    color: #fafafa;    font-family: "Courier New";}::selection {    background-color:  #2ecc40;    color: white;}/* Responsive content positioning */@media only screen and (min-width: 1020px) /* Large screens */{    body{        padding: 10vh 25vw;    }}@media only screen and (max-width: 1020px) and (min-width: 750px) /* Small screens */{    body{        padding: 5vh 10vw;    }}@media only screen and (max-width: 750px) /* Small screens */{    body{        padding: 2vh 5vw;    }}/* Headers */h1{font-size: 2.5rem;}h2{font-size: 1.7rem;}h1 > .subtitle, h3, h4, h5, h6{font-size: 1.3rem;}.title{    margin-bottom: 2.5rem;}/* Padding & Margin */* {margin: 0; padding: 0;}pre, blockquote, ul, ol, p, table{    margin: 1rem 0;}h1, h2{margin-top: 2rem; line-height: 2rem;}h3, h4, h5, h6{margin-top: 1rem;}/* Links  */a, a:visited {    color: #01ff70;    text-decoration: underline;}a:hover, a:focus, a:active {    color: #2ecc40;}/* Code */pre {    font-family: "Courier New";    padding: .5rem;    background-color: #333;    padding: 0.5rem;    border-radius: 0.2rem;    font-size: 0.9rem;    color: #EEE;    overflow-x: auto;}.org-keyword{    color: #01ff70;}.org-rainbow-delimiters-depth-1{    color: #2ecc40;}.org-rainbow-delimiters-depth-2{    color: #01ff70;}/* Blockquotes */blockquote {    border-left: 3px solid #01ff70;    padding-left: 1rem;}li{    list-style-position: inside;}/* Tags */.tag{    margin-top: 0.5rem;    display: block;    color: white;    font-size: var(--font-size-xsmall);}.tag > span{		font-weight: 400;    font-size: 0.8rem;    background-color: #444;    text-transform: uppercase;    border-radius: 2px;    width: fit-content;    height: auto;    padding: 1px 5px;}/* Keywords */.todo{    color: #2ecc40;}.done{    color: #444;}/* Overflows */.outline-text-2, .outline-text-3, .outline-text-4{	  max-width: 100%;	  overflow-x: auto;}/* Table */tr:nth-child(even) {    background-color: #333;}th, td{    padding: 0.5rem;    text-align: center;}.underline{    text-decoration: underline;}img{    max-width: 100%;    height: auto;}
+</style>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Auth and user management documentation</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orga0a05d0">1. Auth endpoint</a>
+<ul>
+<li><a href="#orgeb32082">1.1. Description</a>
+<ul>
+<li><a href="#org1e688e3">1.1.1. sign_in</a></li>
+<li><a href="#org79571cc">1.1.2. sign_up</a></li>
+<li><a href="#org12ed3a1">1.1.3. sign_out</a></li>
+<li><a href="#org207d571">1.1.4. refresh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org5447b03">2. Users endpoint</a>
+<ul>
+<li><a href="#org6e383a2">2.1. Description</a>
+<ul>
+<li><a href="#orgfd80d3e">2.1.1. Create a user (admin)</a></li>
+<li><a href="#orged2a230">2.1.2. Delete account (normal user)</a></li>
+<li><a href="#org0fe8010">2.1.3. Delete user (admin)</a></li>
+<li><a href="#org5706904">2.1.4. Update account (normal user)</a></li>
+<li><a href="#org03476c1">2.1.5. Update user (admin)</a></li>
+<li><a href="#orgfe1fdfe">2.1.6. Get users (admin)</a></li>
+<li><a href="#org13794d2">2.1.7. Get one user (admin)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-orga0a05d0" class="outline-2">
+<h2 id="orga0a05d0"><span class="section-number-2">1.</span> Auth endpoint</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-orgeb32082" class="outline-3">
+<h3 id="orgeb32082"><span class="section-number-3">1.1.</span> Description</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+Using these endpoints users can create an account, sing in into their account, sign out and revoke their tokens and finally refresh their used access_token. We implement a simple access model, each resource a.k.a (path, method) tuple has an integer access level, each user also has an integer access level, users can access resources with lower access level than their own access level.
+On a successful sign in user receives two tokens, one for accessing resources with access level higher than 0, and another for refreshing expired or used access token. Each token regardless of its type can only be used once. After a successful refresh user receives a brand new token couple. Access tokens expire within 10 seconds and Refresh tokens expire within a day. Users have to re-login on refresh token expiration.
+</p>
+</div>
+<div id="outline-container-org1e688e3" class="outline-4">
+<h4 id="org1e688e3"><span class="section-number-4">1.1.1.</span> sign_in</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<ul class="org-ul">
+<li>path: /api/auth/sign_in</li>
+<li>method: POST</li>
+<li>content-type: application/json</li>
+<li><p>
+validation schema:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"$schema"</span>: <span style="color: #c3e88d;">"https://json-schema.org/draft/2020-12/schema"</span>,
+    <span style="color: #c099ff;">"$id"</span>: <span style="color: #c3e88d;">"https://cloud.project/signin.schema.json"</span>,
+    <span style="color: #c099ff;">"title"</span>: <span style="color: #c3e88d;">"SignIn"</span>,
+    <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"Sign in form"</span>,
+    <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"object"</span>,
+    <span style="color: #c099ff;">"properties"</span>: {
+        <span style="color: #c099ff;">"email"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's email"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>,
+            <span style="color: #c099ff;">"format"</span>: <span style="color: #c3e88d;">"email"</span>
+        },
+        <span style="color: #c099ff;">"password"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's password"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>,
+                <span style="color: #c099ff;">"minLength"</span>: <span style="color: #ff995e; font-weight: bold;">8</span>,
+                <span style="color: #c099ff;">"maxLength"</span>: <span style="color: #ff995e; font-weight: bold;">128</span>
+        }
+    },
+    <span style="color: #c099ff;">"required"</span>: [ <span style="color: #c3e88d;">"email"</span>, <span style="color: #c3e88d;">"password"</span> ]
+}
+</pre>
+</div></li>
+<li>example 401:
+<ul class="org-ul">
+<li><p>
+body:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"nono@nono.com"</span>,
+    <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"nonononononono"</span>
+}
+</pre>
+</div></li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"issues"</span>: [
+        <span style="color: #c3e88d;">"wrong password or email"</span>
+    ]
+}
+</pre>
+</div></li>
+</ul></li>
+<li>example 200:
+<ul class="org-ul">
+<li><p>
+body:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test@test.com"</span>,
+    <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"testtest"</span>
+}
+</pre>
+</div></li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"access_token"</span>: <span style="color: #c3e88d;">"token_for_access"</span>,
+    <span style="color: #c099ff;">"refresh_token"</span>: <span style="color: #c3e88d;">"token_for_refresh"</span>
+}
+</pre>
+</div></li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org79571cc" class="outline-4">
+<h4 id="org79571cc"><span class="section-number-4">1.1.2.</span> sign_up</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<ul class="org-ul">
+<li>path: /api/auth/sign_up</li>
+<li>method: POST</li>
+<li>content-type: application/json</li>
+<li><p>
+validation schema:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"$schema"</span>: <span style="color: #c3e88d;">"https://json-schema.org/draft/2020-12/schema"</span>,
+    <span style="color: #c099ff;">"$id"</span>: <span style="color: #c3e88d;">"https://cloud.project/signup.schema.json"</span>,
+    <span style="color: #c099ff;">"title"</span>: <span style="color: #c3e88d;">"SignUp"</span>,
+    <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"Sign up form"</span>,
+    <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"object"</span>,
+    <span style="color: #c099ff;">"properties"</span>: {
+        <span style="color: #c099ff;">"email"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's email"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>,
+            <span style="color: #c099ff;">"format"</span>: <span style="color: #c3e88d;">"email"</span>
+        },
+        <span style="color: #c099ff;">"password"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's password"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>,
+                <span style="color: #c099ff;">"minLength"</span>: <span style="color: #ff995e; font-weight: bold;">8</span>,
+                <span style="color: #c099ff;">"maxLength"</span>: <span style="color: #ff995e; font-weight: bold;">128</span>
+        },
+        <span style="color: #c099ff;">"first_name"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's name"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>
+        },
+        <span style="color: #c099ff;">"first_name"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's last name"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>
+        }
+    },
+    <span style="color: #c099ff;">"required"</span>: [ <span style="color: #c3e88d;">"email"</span>, <span style="color: #c3e88d;">"password"</span>, <span style="color: #c3e88d;">"first_name"</span>, <span style="color: #c3e88d;">"last_name"</span>]
+}
+</pre>
+</div></li>
+<li>example 400:
+<ul class="org-ul">
+<li><p>
+body:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test"</span>,
+    <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test"</span>,
+    <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test@test.com"</span>,
+    <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"testtest"</span>
+}
+</pre>
+</div></li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"issues"</span>: [
+        <span style="color: #c3e88d;">"User already exists."</span>
+    ]
+}
+</pre>
+</div></li>
+</ul></li>
+<li>example 400:
+<ul class="org-ul">
+<li><p>
+body:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test"</span>,
+    <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test"</span>,
+    <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test_badmail.com"</span>,
+    <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"testtest"</span>
+}
+</pre>
+</div></li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"issues"</span>: [
+        <span style="color: #c3e88d;">"\"test_badmail.com\" is not a \"email\""</span>
+    ]
+}
+</pre>
+</div></li>
+</ul></li>
+<li>example 200:
+<ul class="org-ul">
+<li><p>
+body:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test"</span>,
+    <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test"</span>,
+    <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"testttseqwettt@test.com"</span>,
+    <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"testtest"</span>
+}
+</pre>
+</div></li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"message"</span>: <span style="color: #c3e88d;">"Your account was created successfully, use login api to get auth token"</span>
+}
+</pre>
+</div></li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org12ed3a1" class="outline-4">
+<h4 id="org12ed3a1"><span class="section-number-4">1.1.3.</span> sign_out</h4>
+<div class="outline-text-4" id="text-1-1-3">
+<ul class="org-ul">
+<li>path: /api/auth/sign_in</li>
+<li>method: POST</li>
+<li>header: Authorization Bearer &lt;access_token&gt;</li>
+<li>content-type: application/json</li>
+<li><p>
+validation schema:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"$schema"</span>: <span style="color: #c3e88d;">"https://json-schema.org/draft/2020-12/schema"</span>,
+    <span style="color: #c099ff;">"$id"</span>: <span style="color: #c3e88d;">"https://cloud.project/signout.schema.json"</span>,
+    <span style="color: #c099ff;">"title"</span>: <span style="color: #c3e88d;">"SignOut"</span>,
+    <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"Sign out form"</span>,
+    <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"object"</span>,
+    <span style="color: #c099ff;">"properties"</span>: {
+        <span style="color: #c099ff;">"refresh_token"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's valid refresh token"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>,
+        },
+    },
+    <span style="color: #c099ff;">"required"</span>: [ <span style="color: #c3e88d;">"refresh_token"</span> ]
+}
+</pre>
+</div></li>
+<li>example 401:
+<ul class="org-ul">
+<li>invalid token within header</li>
+<li><p>
+body:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"refresh_token"</span>: <span style="color: #c3e88d;">"refresh_token"</span>
+}
+</pre>
+</div></li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"issues"</span>: [
+        <span style="color: #c3e88d;">"You don't have access to this resource"</span>
+    ]
+}
+</pre>
+</div></li>
+</ul></li>
+<li>example 200:
+<ul class="org-ul">
+<li>valid token in header and body</li>
+<li><p>
+body:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"refresh_token"</span>: <span style="color: #c3e88d;">"refresh_token"</span>
+}
+</pre>
+</div></li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"Message"</span>: <span style="color: #c3e88d;">"Sing out was successful."</span>
+}
+</pre>
+</div></li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org207d571" class="outline-4">
+<h4 id="org207d571"><span class="section-number-4">1.1.4.</span> refresh</h4>
+<div class="outline-text-4" id="text-1-1-4">
+<ul class="org-ul">
+<li>note : Users can not use this endpoint prior to access token expiration.</li>
+<li>path: /api/auth/refresh</li>
+<li>method: POST</li>
+<li>content-type: application/json</li>
+<li><p>
+validation schema:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"$schema"</span>: <span style="color: #c3e88d;">"https://json-schema.org/draft/2020-12/schema"</span>,
+    <span style="color: #c099ff;">"$id"</span>: <span style="color: #c3e88d;">"https://cloud.project/refresh.schema.json"</span>,
+    <span style="color: #c099ff;">"title"</span>: <span style="color: #c3e88d;">"Refresh"</span>,
+    <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"Refresh token form"</span>,
+    <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"object"</span>,
+    <span style="color: #c099ff;">"properties"</span>: {
+        <span style="color: #c099ff;">"refresh_token"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's valid refresh token"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>,
+        },
+    },
+    <span style="color: #c099ff;">"required"</span>: [ <span style="color: #c3e88d;">"refresh_token"</span> ]
+}
+</pre>
+</div></li>
+<li>example 200:
+<ul class="org-ul">
+<li><p>
+body:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"refresh_token"</span>: <span style="color: #c3e88d;">"refresh_token"</span>
+}
+</pre>
+</div></li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"access_token"</span>: <span style="color: #c3e88d;">"token_for_access"</span>,
+    <span style="color: #c099ff;">"refresh_token"</span>: <span style="color: #c3e88d;">"token_for_refresh"</span>
+}
+</pre>
+</div></li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org5447b03" class="outline-2">
+<h2 id="org5447b03"><span class="section-number-2">2.</span> Users endpoint</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-org6e383a2" class="outline-3">
+<h3 id="org6e383a2"><span class="section-number-3">2.1.</span> Description</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+Some of these endpoints are only available to admin. Users can update their account, actions like changing their email, password or name and last_name. Admins can retrieve list of users, filter them, or get one specific user by their ID. Admins can also update or delete users accounts.
+</p>
+</div>
+<div id="outline-container-orgfd80d3e" class="outline-4">
+<h4 id="orgfd80d3e"><span class="section-number-4">2.1.1.</span> Create a user (admin)</h4>
+<div class="outline-text-4" id="text-2-1-1">
+<ul class="org-ul">
+<li>note : admins can not create users with higher access level than theirs</li>
+<li>path: /api/users</li>
+<li>method: POST</li>
+<li>header: Authorization Bearer &lt;access_token&gt;</li>
+<li>content-type: application/json</li>
+<li><p>
+validation schema:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"$schema"</span>: <span style="color: #c3e88d;">"https://json-schema.org/draft/2020-12/schema"</span>,
+    <span style="color: #c099ff;">"$id"</span>: <span style="color: #c3e88d;">"https://cloud.project/create.schema.json"</span>,
+    <span style="color: #c099ff;">"title"</span>: <span style="color: #c3e88d;">"Create"</span>,
+    <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"Admin's Create user form"</span>,
+    <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"object"</span>,
+    <span style="color: #c099ff;">"properties"</span>: {
+        <span style="color: #c099ff;">"email"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's email"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>,
+            <span style="color: #c099ff;">"format"</span>: <span style="color: #c3e88d;">"email"</span>
+        },
+        <span style="color: #c099ff;">"password"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's password"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>,
+                <span style="color: #c099ff;">"minLength"</span>: <span style="color: #ff995e; font-weight: bold;">8</span>,
+                <span style="color: #c099ff;">"maxLength"</span>: <span style="color: #ff995e; font-weight: bold;">128</span>
+        },
+        <span style="color: #c099ff;">"first_name"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's name"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>
+        },
+        <span style="color: #c099ff;">"first_name"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's last name"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>
+        },
+        <span style="color: #c099ff;">"access_level"</span>: {
+            <span style="color: #c099ff;">"description"</span> : <span style="color: #c3e88d;">"User's access level"</span>,
+            <span style="color: #c099ff;">"type"</span> : <span style="color: #c3e88d;">"integer"</span>,
+            <span style="color: #c099ff;">"minimum"</span> : <span style="color: #ff995e; font-weight: bold;">0</span>
+        }
+    },
+    <span style="color: #c099ff;">"required"</span>: [ <span style="color: #c3e88d;">"email"</span>, <span style="color: #c3e88d;">"password"</span>, <span style="color: #c3e88d;">"first_name"</span>, <span style="color: #c3e88d;">"last_name"</span>, <span style="color: #c3e88d;">"access_level"</span>]
+}
+</pre>
+</div></li>
+<li>example 401:
+<ul class="org-ul">
+<li>invalid token within header or user with non admin access level</li>
+<li><p>
+body:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test18"</span>,
+    <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test18"</span>,
+    <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test109@test.com"</span>,
+    <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"testtest"</span>,
+    <span style="color: #c099ff;">"access_level"</span>: <span style="color: #ff995e; font-weight: bold;">1</span>
+}
+</pre>
+</div></li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"issues"</span>: [
+        <span style="color: #c3e88d;">"You don't have access to this resource"</span>
+    ]
+}
+</pre>
+</div></li>
+</ul></li>
+<li>example 200:
+<ul class="org-ul">
+<li>valid token in header with admin access level</li>
+<li><p>
+body:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test16"</span>,
+    <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test16"</span>,
+    <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test108@test.com"</span>,
+    <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"testtest"</span>,
+    <span style="color: #c099ff;">"access_level"</span>: <span style="color: #ff995e; font-weight: bold;">1</span>
+}
+</pre>
+</div></li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"message"</span>: <span style="color: #c3e88d;">"User was created successfully"</span>
+}
+</pre>
+</div></li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orged2a230" class="outline-4">
+<h4 id="orged2a230"><span class="section-number-4">2.1.2.</span> Delete account (normal user)</h4>
+<div class="outline-text-4" id="text-2-1-2">
+<ul class="org-ul">
+<li>note: Deletes requesting user&rsquo;s account</li>
+<li>path: /api/users</li>
+<li>method: DELETE</li>
+<li>header: Authorization Bearer &lt;access_token&gt;</li>
+<li>example 401:
+<ul class="org-ul">
+<li>invalid token within header</li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"issues"</span>: [
+        <span style="color: #c3e88d;">"You don't have access to this resource"</span>
+    ]
+}
+</pre>
+</div></li>
+</ul></li>
+<li>example 200:
+<ul class="org-ul">
+<li>valid token in header with normal user access level</li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"message"</span>: <span style="color: #c3e88d;">"Your account was deleted successfully"</span>
+}
+</pre>
+</div></li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org0fe8010" class="outline-4">
+<h4 id="org0fe8010"><span class="section-number-4">2.1.3.</span> Delete user (admin)</h4>
+<div class="outline-text-4" id="text-2-1-3">
+<ul class="org-ul">
+<li>note: Deletes requesting user&rsquo;s account</li>
+<li>path: /api/users/{id}</li>
+<li>path_params:
+<ul class="org-ul">
+<li>id: valid ObjectId string</li>
+</ul></li>
+<li>method: DELETE</li>
+<li>header: Authorization Bearer &lt;access_token&gt;</li>
+<li>example 401:
+<ul class="org-ul">
+<li>invalid token within header</li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"issues"</span>: [
+        <span style="color: #c3e88d;">"You don't have access to this resource"</span>
+    ]
+}
+</pre>
+</div></li>
+</ul></li>
+<li>example 404:
+<ul class="org-ul">
+<li>valid token in header with admin access level</li>
+<li>valid id, but non existent</li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"message"</span>: <span style="color: #c3e88d;">"User does not exist."</span>
+}
+</pre>
+</div></li>
+</ul></li>
+<li>example 200:
+<ul class="org-ul">
+<li>valid token in header with admin access level</li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"message"</span>: <span style="color: #c3e88d;">"User was deleted successfully"</span>
+}
+</pre>
+</div></li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org5706904" class="outline-4">
+<h4 id="org5706904"><span class="section-number-4">2.1.4.</span> Update account (normal user)</h4>
+<div class="outline-text-4" id="text-2-1-4">
+<ul class="org-ul">
+<li>note: Updates requesting user&rsquo;s account</li>
+<li>path: /api/users</li>
+<li>method: PUT</li>
+<li>header: Authorization Bearer &lt;access_token&gt;</li>
+<li>content-type: application/json</li>
+<li><p>
+validation schema:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"$schema"</span>: <span style="color: #c3e88d;">"https://json-schema.org/draft/2020-12/schema"</span>,
+    <span style="color: #c099ff;">"$id"</span>: <span style="color: #c3e88d;">"https://cloud.project/update.schema.json"</span>,
+    <span style="color: #c099ff;">"title"</span>: <span style="color: #c3e88d;">"Create"</span>,
+    <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"Admin's Create user form"</span>,
+    <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"object"</span>,
+    <span style="color: #c099ff;">"properties"</span>: {
+        <span style="color: #c099ff;">"email"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's email"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>,
+            <span style="color: #c099ff;">"format"</span>: <span style="color: #c3e88d;">"email"</span>
+        },
+        <span style="color: #c099ff;">"first_name"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's name"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>
+        },
+        <span style="color: #c099ff;">"password"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's password"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>,
+                <span style="color: #c099ff;">"minLength"</span>: <span style="color: #ff995e; font-weight: bold;">8</span>,
+                <span style="color: #c099ff;">"maxLength"</span>: <span style="color: #ff995e; font-weight: bold;">128</span>
+        },
+        <span style="color: #c099ff;">"first_name"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's last name"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>
+        }
+    },
+    <span style="color: #c099ff;">"anyOf"</span> : [
+        {<span style="color: #c099ff;">"required"</span>: [ <span style="color: #c3e88d;">"email"</span> ]},
+        {<span style="color: #c099ff;">"required"</span>: [ <span style="color: #c3e88d;">"password"</span> ]},
+        {<span style="color: #c099ff;">"required"</span>: [ <span style="color: #c3e88d;">"first_name"</span> ]},
+        {<span style="color: #c099ff;">"required"</span>: [ <span style="color: #c3e88d;">"last_name"</span>]},
+    ]
+}
+</pre>
+</div></li>
+<li>example 401:
+<ul class="org-ul">
+<li>invalid token within header</li>
+<li><p>
+body:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test16"</span>,
+    <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test16"</span>,
+    <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test108@test.com"</span>,
+    <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"testtest"</span>,
+}
+</pre>
+</div></li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"issues"</span>: [
+        <span style="color: #c3e88d;">"You don't have access to this resource"</span>
+    ]
+}
+</pre>
+</div></li>
+</ul></li>
+<li>example 200:
+<ul class="org-ul">
+<li>valid token in header with normal user access level</li>
+<li>provided email does not already exist in the DB</li>
+<li><p>
+body:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test16"</span>,
+    <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test16"</span>,
+    <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test108@test.com"</span>,
+    <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"testtest"</span>,
+}
+</pre>
+</div></li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"message"</span>: <span style="color: #c3e88d;">"Your account was updated successfully"</span>
+}
+</pre>
+</div></li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org03476c1" class="outline-4">
+<h4 id="org03476c1"><span class="section-number-4">2.1.5.</span> Update user (admin)</h4>
+<div class="outline-text-4" id="text-2-1-5">
+<ul class="org-ul">
+<li>note: Admins can not promote users to higher access level than theirs.</li>
+<li>path: /api/users/{id}</li>
+<li>path_params:
+<ul class="org-ul">
+<li>id: valid ObjectId string</li>
+</ul></li>
+<li>method: PUT</li>
+<li>header: Authorization Bearer &lt;access_token&gt;</li>
+<li>content-type: application/json</li>
+<li><p>
+validation schema:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"$schema"</span>: <span style="color: #c3e88d;">"https://json-schema.org/draft/2020-12/schema"</span>,
+    <span style="color: #c099ff;">"$id"</span>: <span style="color: #c3e88d;">"https://cloud.project/admin.update.schema.json"</span>,
+    <span style="color: #c099ff;">"title"</span>: <span style="color: #c3e88d;">"Create"</span>,
+    <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"Admin's Create user form"</span>,
+    <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"object"</span>,
+    <span style="color: #c099ff;">"properties"</span>: {
+        <span style="color: #c099ff;">"email"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's email"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>,
+            <span style="color: #c099ff;">"format"</span>: <span style="color: #c3e88d;">"email"</span>
+        },
+        <span style="color: #c099ff;">"first_name"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's name"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>
+        },
+        <span style="color: #c099ff;">"password"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's password"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>,
+                <span style="color: #c099ff;">"minLength"</span>: <span style="color: #ff995e; font-weight: bold;">8</span>,
+                <span style="color: #c099ff;">"maxLength"</span>: <span style="color: #ff995e; font-weight: bold;">128</span>
+        },
+        <span style="color: #c099ff;">"first_name"</span>: {
+            <span style="color: #c099ff;">"description"</span>: <span style="color: #c3e88d;">"User's last name"</span>,
+            <span style="color: #c099ff;">"type"</span>: <span style="color: #c3e88d;">"string"</span>
+        },
+        <span style="color: #c099ff;">"access_level"</span>: {
+            <span style="color: #c099ff;">"description"</span> : <span style="color: #c3e88d;">"User's access level"</span>,
+            <span style="color: #c099ff;">"type"</span> : <span style="color: #c3e88d;">"integer"</span>,
+            <span style="color: #c099ff;">"minimum"</span> : <span style="color: #ff995e; font-weight: bold;">0</span>
+        }
+    },
+    <span style="color: #c099ff;">"anyOf"</span> : [
+        {<span style="color: #c099ff;">"required"</span>: [ <span style="color: #c3e88d;">"email"</span> ]},
+        {<span style="color: #c099ff;">"required"</span>: [ <span style="color: #c3e88d;">"password"</span> ]},
+        {<span style="color: #c099ff;">"required"</span>: [ <span style="color: #c3e88d;">"first_name"</span> ]},
+        {<span style="color: #c099ff;">"required"</span>: [ <span style="color: #c3e88d;">"last_name"</span>]},
+        {<span style="color: #c099ff;">"required"</span>: [ <span style="color: #c3e88d;">"access_level"</span>]},
+    ]
+}
+</pre>
+</div></li>
+<li>example 401:
+<ul class="org-ul">
+<li>invalid token within header</li>
+<li><p>
+body:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test16"</span>,
+    <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test16"</span>,
+    <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test108@test.com"</span>,
+    <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"testtest"</span>,
+    <span style="color: #c099ff;">"access_level"</span>: <span style="color: #ff995e; font-weight: bold;">1</span>
+}
+</pre>
+</div></li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"issues"</span>: [
+        <span style="color: #c3e88d;">"You don't have access to this resource"</span>
+    ]
+}
+</pre>
+</div></li>
+</ul></li>
+<li>example 400:
+<ul class="org-ul">
+<li>valid token in header with admin access level</li>
+<li><p>
+body:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test16"</span>,
+    <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test16"</span>,
+    <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test108@test.com"</span>,
+    <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"testtest"</span>,
+    <span style="color: #c099ff;">"access_level"</span>: <span style="color: #ff995e; font-weight: bold;">2000</span>
+}
+</pre>
+</div></li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"issues"</span>: [
+        <span style="color: #c3e88d;">"You can not promote user to higher access level than yours"</span>
+    ]
+}
+</pre>
+</div></li>
+</ul></li>
+<li>example 404:
+<ul class="org-ul">
+<li>valid token in header with admin access level</li>
+<li>valid id, but non existent</li>
+<li><p>
+body:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test16"</span>,
+    <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test16"</span>,
+    <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test108@test.com"</span>,
+    <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"testtest"</span>,
+    <span style="color: #c099ff;">"access_level"</span>: <span style="color: #ff995e; font-weight: bold;">1</span>
+}
+</pre>
+</div></li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"message"</span>: <span style="color: #c3e88d;">"User does not exist."</span>
+}
+</pre>
+</div></li>
+</ul></li>
+<li>example 200:
+<ul class="org-ul">
+<li>valid token in header with admin access level</li>
+<li>provided email does not already exist in the DB</li>
+<li><p>
+body:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test16"</span>,
+    <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test16"</span>,
+    <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test108@test.com"</span>,
+    <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"testtest"</span>,
+    <span style="color: #c099ff;">"access_level"</span>: <span style="color: #ff995e; font-weight: bold;">2</span>
+}
+</pre>
+</div></li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"message"</span>: <span style="color: #c3e88d;">"User was updated successfully"</span>
+}
+</pre>
+</div></li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgfe1fdfe" class="outline-4">
+<h4 id="orgfe1fdfe"><span class="section-number-4">2.1.6.</span> Get users (admin)</h4>
+<div class="outline-text-4" id="text-2-1-6">
+<ul class="org-ul">
+<li>note: Gets users accounts filtered by query params</li>
+<li>path: /api/users</li>
+<li>method: GET</li>
+<li>query_params:
+<ul class="org-ul">
+<li><p>
+Deserialized version (no query param is required, all of them are optional):
+</p>
+<div class="org-src-container">
+<pre class="src src-rust"><span style="color: #c099ff;">pub</span> <span style="color: #c099ff;">struct</span> <span style="color: #ffc777;">UserFilter</span> {
+    <span style="color: #c099ff;">pub</span> <span style="color: #ff98a4;">page</span>: <span style="color: #ffc777;">Option</span>&lt;<span style="color: #ffc777;">u64</span>&gt;,
+    <span style="color: #c099ff;">pub</span> <span style="color: #ff98a4;">size</span>: <span style="color: #ffc777;">Option</span>&lt;<span style="color: #ffc777;">u64</span>&gt;,
+    <span style="color: #c099ff;">pub</span> <span style="color: #ff98a4;">first_name</span>: <span style="color: #ffc777;">Option</span>&lt;<span style="color: #ffc777;">String</span>&gt;,
+    <span style="color: #c099ff;">pub</span> <span style="color: #ff98a4;">last_name</span>: <span style="color: #ffc777;">Option</span>&lt;<span style="color: #ffc777;">String</span>&gt;,
+    <span style="color: #c099ff;">pub</span> <span style="color: #ff98a4;">email</span>: <span style="color: #ffc777;">Option</span>&lt;<span style="color: #ffc777;">String</span>&gt;,
+    <span style="color: #c099ff;">pub</span> <span style="color: #ff98a4;">access_level</span>: <span style="color: #ffc777;">Option</span>&lt;<span style="color: #ffc777;">i32</span>&gt;,
+    <span style="color: #c099ff;">pub</span> <span style="color: #ff98a4;">access_level_cmp</span>: <span style="color: #ffc777;">Option</span>&lt;<span style="color: #ffc777;">u8</span>&gt;,
+}
+</pre>
+</div>
+<ul class="org-ul">
+<li>page : page number, defaults to 1</li>
+<li>size : page size, defaults to 20</li>
+<li>access_level_cmp : compare sign for access_level, (0 or greater than 4, <code>==</code>), (1, &gt;), (2, &gt;=), (3, &lt;), (4, &lt;=)</li>
+<li>access_level : user&rsquo;s access level</li>
+<li>first_name : looks for any first_name that contains the param</li>
+<li>last_name : looks for any first_name that contains the param</li>
+<li>email : looks for any first_name that contains the param</li>
+</ul></li>
+</ul></li>
+<li>header: Authorization Bearer &lt;access_token&gt;</li>
+<li>example 401:
+<ul class="org-ul">
+<li>invalid token within header</li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"issues"</span>: [
+        <span style="color: #c3e88d;">"You don't have access to this resource"</span>
+    ]
+}
+</pre>
+</div></li>
+</ul></li>
+<li>example 200:
+<ul class="org-ul">
+<li>valid token in header with admin access level</li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"message"</span>: <span style="color: #c3e88d;">"Users retrieved successfully"</span>,
+    <span style="color: #c099ff;">"data"</span>: {
+        <span style="color: #c099ff;">"page"</span>: <span style="color: #ff995e; font-weight: bold;">1</span>,
+        <span style="color: #c099ff;">"total_count"</span>: <span style="color: #ff995e; font-weight: bold;">10</span>,
+        <span style="color: #c099ff;">"data"</span>: [
+            {
+                <span style="color: #c099ff;">"_id"</span>: {
+                    <span style="color: #c099ff;">"$oid"</span>: <span style="color: #c3e88d;">"626fa45c49a4b8812b87c114"</span>
+                },
+                <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test0"</span>,
+                <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test0"</span>,
+                <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test100@test.com"</span>,
+                <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS"</span>,
+                <span style="color: #c099ff;">"access_level"</span>: <span style="color: #ff995e; font-weight: bold;">1</span>,
+                <span style="color: #c099ff;">"creation_date"</span>: <span style="color: #c3e88d;">"2022-05-02T09:29:00.332838625Z"</span>,
+                <span style="color: #c099ff;">"is_deleted"</span>: <span style="color: #ff995e;">false</span>
+            },
+            {
+                <span style="color: #c099ff;">"_id"</span>: {
+                    <span style="color: #c099ff;">"$oid"</span>: <span style="color: #c3e88d;">"626fa45c49a4b8812b87c115"</span>
+                },
+                <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test2"</span>,
+                <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test2"</span>,
+                <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test101@test.com"</span>,
+                <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS"</span>,
+                <span style="color: #c099ff;">"access_level"</span>: <span style="color: #ff995e; font-weight: bold;">1</span>,
+                <span style="color: #c099ff;">"creation_date"</span>: <span style="color: #c3e88d;">"2022-05-02T09:29:00.685498505Z"</span>,
+                <span style="color: #c099ff;">"is_deleted"</span>: <span style="color: #ff995e;">false</span>
+            },
+            {
+                <span style="color: #c099ff;">"_id"</span>: {
+                    <span style="color: #c099ff;">"$oid"</span>: <span style="color: #c3e88d;">"626fa45d49a4b8812b87c116"</span>
+                },
+                <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test4"</span>,
+                <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test4"</span>,
+                <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test102@test.com"</span>,
+                <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS"</span>,
+                <span style="color: #c099ff;">"access_level"</span>: <span style="color: #ff995e; font-weight: bold;">1</span>,
+                <span style="color: #c099ff;">"creation_date"</span>: <span style="color: #c3e88d;">"2022-05-02T09:29:01.038923716Z"</span>,
+                <span style="color: #c099ff;">"is_deleted"</span>: <span style="color: #ff995e;">false</span>
+            },
+            {
+                <span style="color: #c099ff;">"_id"</span>: {
+                    <span style="color: #c099ff;">"$oid"</span>: <span style="color: #c3e88d;">"626fa45d49a4b8812b87c117"</span>
+                },
+                <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test6"</span>,
+                <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test6"</span>,
+                <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test103@test.com"</span>,
+                <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS"</span>,
+                <span style="color: #c099ff;">"access_level"</span>: <span style="color: #ff995e; font-weight: bold;">1</span>,
+                <span style="color: #c099ff;">"creation_date"</span>: <span style="color: #c3e88d;">"2022-05-02T09:29:01.391341354Z"</span>,
+                <span style="color: #c099ff;">"is_deleted"</span>: <span style="color: #ff995e;">false</span>
+            },
+            {
+                <span style="color: #c099ff;">"_id"</span>: {
+                    <span style="color: #c099ff;">"$oid"</span>: <span style="color: #c3e88d;">"626fa45d49a4b8812b87c118"</span>
+                },
+                <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test8"</span>,
+                <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test8"</span>,
+                <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test104@test.com"</span>,
+                <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS"</span>,
+                <span style="color: #c099ff;">"access_level"</span>: <span style="color: #ff995e; font-weight: bold;">1</span>,
+                <span style="color: #c099ff;">"creation_date"</span>: <span style="color: #c3e88d;">"2022-05-02T09:29:01.741648961Z"</span>,
+                <span style="color: #c099ff;">"is_deleted"</span>: <span style="color: #ff995e;">false</span>
+            },
+            {
+                <span style="color: #c099ff;">"_id"</span>: {
+                    <span style="color: #c099ff;">"$oid"</span>: <span style="color: #c3e88d;">"626fa45e49a4b8812b87c119"</span>
+                },
+                <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test10"</span>,
+                <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test10"</span>,
+                <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test105@test.com"</span>,
+                <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS"</span>,
+                <span style="color: #c099ff;">"access_level"</span>: <span style="color: #ff995e; font-weight: bold;">1</span>,
+                <span style="color: #c099ff;">"creation_date"</span>: <span style="color: #c3e88d;">"2022-05-02T09:29:02.092838237Z"</span>,
+                <span style="color: #c099ff;">"is_deleted"</span>: <span style="color: #ff995e;">false</span>
+            },
+            {
+                <span style="color: #c099ff;">"_id"</span>: {
+                    <span style="color: #c099ff;">"$oid"</span>: <span style="color: #c3e88d;">"626fa45e49a4b8812b87c11a"</span>
+                },
+                <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test12"</span>,
+                <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test12"</span>,
+                <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test106@test.com"</span>,
+                <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS"</span>,
+                <span style="color: #c099ff;">"access_level"</span>: <span style="color: #ff995e; font-weight: bold;">1</span>,
+                <span style="color: #c099ff;">"creation_date"</span>: <span style="color: #c3e88d;">"2022-05-02T09:29:02.442527442Z"</span>,
+                <span style="color: #c099ff;">"is_deleted"</span>: <span style="color: #ff995e;">false</span>
+            },
+            {
+                <span style="color: #c099ff;">"_id"</span>: {
+                    <span style="color: #c099ff;">"$oid"</span>: <span style="color: #c3e88d;">"626fa45e49a4b8812b87c11b"</span>
+                },
+                <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test14"</span>,
+                <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test14"</span>,
+                <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test107@test.com"</span>,
+                <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS"</span>,
+                <span style="color: #c099ff;">"access_level"</span>: <span style="color: #ff995e; font-weight: bold;">1</span>,
+                <span style="color: #c099ff;">"creation_date"</span>: <span style="color: #c3e88d;">"2022-05-02T09:29:02.792700929Z"</span>,
+                <span style="color: #c099ff;">"is_deleted"</span>: <span style="color: #ff995e;">false</span>
+            },
+            {
+                <span style="color: #c099ff;">"_id"</span>: {
+                    <span style="color: #c099ff;">"$oid"</span>: <span style="color: #c3e88d;">"626fa45f49a4b8812b87c11c"</span>
+                },
+                <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test16"</span>,
+                <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test16"</span>,
+                <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test108@test.com"</span>,
+                <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS"</span>,
+                <span style="color: #c099ff;">"access_level"</span>: <span style="color: #ff995e; font-weight: bold;">1</span>,
+                <span style="color: #c099ff;">"creation_date"</span>: <span style="color: #c3e88d;">"2022-05-02T09:29:03.143907645Z"</span>,
+                <span style="color: #c099ff;">"is_deleted"</span>: <span style="color: #ff995e;">false</span>
+            },
+            {
+                <span style="color: #c099ff;">"_id"</span>: {
+                    <span style="color: #c099ff;">"$oid"</span>: <span style="color: #c3e88d;">"626fa45f49a4b8812b87c11d"</span>
+                },
+                <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test18"</span>,
+                <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test18"</span>,
+                <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test109@test.com"</span>,
+                <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS"</span>,
+                <span style="color: #c099ff;">"access_level"</span>: <span style="color: #ff995e; font-weight: bold;">1</span>,
+                <span style="color: #c099ff;">"creation_date"</span>: <span style="color: #c3e88d;">"2022-05-02T09:29:03.497216217Z"</span>,
+                <span style="color: #c099ff;">"is_deleted"</span>: <span style="color: #ff995e;">false</span>
+            }
+        ]
+    }
+}
+</pre>
+</div></li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+
+<div id="outline-container-org13794d2" class="outline-4">
+<h4 id="org13794d2"><span class="section-number-4">2.1.7.</span> Get one user (admin)</h4>
+<div class="outline-text-4" id="text-2-1-7">
+<ul class="org-ul">
+<li>path: /api/users/{id}</li>
+<li>path_params:
+<ul class="org-ul">
+<li>id: valid ObjectId string</li>
+</ul></li>
+<li>method: DELETE</li>
+<li>header: Authorization Bearer &lt;access_token&gt;</li>
+<li>example 401:
+<ul class="org-ul">
+<li>invalid token within header</li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"issues"</span>: [
+        <span style="color: #c3e88d;">"You don't have access to this resource"</span>
+    ]
+}
+</pre>
+</div></li>
+</ul></li>
+<li>example 404:
+<ul class="org-ul">
+<li>valid token in header with admin access level</li>
+<li>valid id, but non existent</li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"message"</span>: <span style="color: #c3e88d;">"User does not exist."</span>
+}
+</pre>
+</div></li>
+</ul></li>
+<li>example 200:
+<ul class="org-ul">
+<li>valid token in header with admin access level</li>
+<li><p>
+response:
+</p>
+<div class="org-src-container">
+<pre class="src src-json">{
+    <span style="color: #c099ff;">"message"</span>: <span style="color: #c3e88d;">"User retrieved successfully"</span>,
+    <span style="color: #c099ff;">"data"</span>: [
+        {
+            <span style="color: #c099ff;">"_id"</span>: {
+                <span style="color: #c099ff;">"$oid"</span>: <span style="color: #c3e88d;">"626fa45c49a4b8812b87c114"</span>
+            },
+            <span style="color: #c099ff;">"first_name"</span>: <span style="color: #c3e88d;">"test0"</span>,
+            <span style="color: #c099ff;">"last_name"</span>: <span style="color: #c3e88d;">"test0"</span>,
+            <span style="color: #c099ff;">"email"</span>: <span style="color: #c3e88d;">"test100@test.com"</span>,
+            <span style="color: #c099ff;">"password"</span>: <span style="color: #c3e88d;">"$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS"</span>,
+            <span style="color: #c099ff;">"access_level"</span>: <span style="color: #ff995e; font-weight: bold;">1</span>,
+            <span style="color: #c099ff;">"creation_date"</span>: <span style="color: #c3e88d;">"2022-05-02T09:29:00.332838625Z"</span>,
+            <span style="color: #c099ff;">"is_deleted"</span>: <span style="color: #ff995e;">false</span>
+        }
+    ]
+}
+</pre>
+</div></li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Tooraj Taraz</p>
+<p class="date">Created: 2022-05-02 Mon 15:01</p>
+</div>
+</body>
+</html>
