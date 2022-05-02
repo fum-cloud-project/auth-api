@@ -26,8 +26,9 @@ use crate::state::AppState;
 use bootstrap_utils::add_resources::add_resources;
 //external modules
 use actix::Actor;
+use actix_cors::Cors;
 use actix_web::middleware::Logger;
-use actix_web::{web::Data, App, HttpServer};
+use actix_web::{http, web::Data, App, HttpServer};
 use mongodb::{options::ClientOptions, Client};
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -62,12 +63,18 @@ async fn main() -> std::io::Result<()> {
     let cache_addr = actor_cache.start();
 
     HttpServer::new(move || {
+        let cors = Cors::default()
+            .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
+            .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+            .allowed_header(http::header::CONTENT_TYPE)
+            .max_age(3600);
         App::new()
             .wrap(rbac::Rbac {
                 db: db_addr.clone(),
                 cache: cache_addr.clone(),
                 secret: dotenv!("SECRET").to_string(),
             })
+            .wrap(cors)
             .wrap(Logger::default())
             .service(
                 actix_web::web::scope("/api")
