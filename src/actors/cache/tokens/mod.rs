@@ -77,7 +77,7 @@ impl Handler<BanUser> for CacheActor {
                 .query_async(&mut connection)
                 .await
             {
-                Ok::<Vec<String>, redis::RedisError>(_) => Ok(()),
+                Ok::<String, redis::RedisError>(_) => Ok(()),
                 Err(_) => Err(()),
             }
         })
