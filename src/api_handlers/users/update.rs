@@ -7,17 +7,19 @@ use crate::utils::validations::validate;
 use actix_web::{
     put,
     web::{Data, Json, Path},
-    HttpResponse, Responder,
+    HttpMessage, HttpRequest, HttpResponse, Responder,
 };
 use bson::oid::ObjectId;
 use serde_json::json;
 
 #[put("/{id}")]
 pub async fn update_admin(
+    req: HttpRequest,
     id: Path<(String,)>,
     user: Json<UserDataUpdateAdmin>,
     state: Data<AppState>,
 ) -> impl Responder {
+    let user_access_level: i32 = req.extensions().get::<i32>().unwrap().to_owned();
     let id = match ObjectId::parse_str(id.into_inner().0) {
         Ok(v) => v,
         _ => {
@@ -38,6 +40,13 @@ pub async fn update_admin(
         Ok(_) => {}
         Err(e) => {
             return HttpResponse::BadRequest().json(json!({ "issues": e }));
+        }
+    }
+    if let Some(access_level) = user.access_level {
+        if access_level > user_access_level {
+            return HttpResponse::Unauthorized().json(
+                json!({ "issues": ["You can not promote user to higher access level than yours"] }),
+            );
         }
     }
     let hashed_password = if let Some(p) = user.password {
