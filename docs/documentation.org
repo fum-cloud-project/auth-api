@@ -1,0 +1,4 @@
+#+TITLE: Auth and user management documentation
+#+AUTHOR: Tooraj Taraz
+#+OPTIONS: ^:nil _:nil
+#+SETUPFILE: ~/.doom.d/retro-dark.theme
