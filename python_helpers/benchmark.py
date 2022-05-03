@@ -39,8 +39,8 @@ def refresh(token, reftok):
 #create 1000 threads and test the performance
 import threading
 def worker(i):
-    signup("test", "test", "test@test.com", "testtest")
-    tokens = signin("test@test.com", "testtest")
+    signup("test" + str(i), "test" + str(i), "test" + str(i) + "@gmail.com", "testtest" + str(i))
+    tokens = signin("test" + str(i) + "@gmail.com", "testtest" + str(i))
     stub.GetUser(auth_pb2.JsonWebToken(jwt=tokens['access_token']))
     stub.HasAccess(auth_pb2.Resource(path='/api/auth/sign_out', method='POST', jwt=tokens['access_token'])).has_access
     tokens = refresh(tokens['access_token'], tokens['refresh_token'])

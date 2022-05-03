@@ -132,7 +132,7 @@ print(json.dumps(users, indent=4))
 tokens = refresh(tokens['access_token'], tokens['refresh_token'])
 #update created users
 for i in range(10):
-    update_admin(tokens['access_token'], users["data"]["data"][i]["_id"]["$oid"], "test" + str(i * 2), "test" + str(i * 2), "test" + str(i + 100) + "@test.com", "testtest", access_level=2000)
+    update_admin(tokens['access_token'], users["data"]["data"][i]["_id"]["$oid"], "test" + str(i * 2), "test" + str(i * 2), "test" + str(i + 100) + "@test.com", "testtest", access_level=1)
     tokens = refresh(tokens['access_token'], tokens['refresh_token'])
 
 #delete created users
