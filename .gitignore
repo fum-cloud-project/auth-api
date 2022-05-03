@@ -3,6 +3,6 @@
 /logs
 /__pycache__
 /python_helpers/__pycache__
+.env.docker
 .env
 .env.dev
-.env.docker
