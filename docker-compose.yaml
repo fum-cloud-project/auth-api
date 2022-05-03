@@ -7,6 +7,11 @@ services:
       dockerfile: "Dockerfile.api"
       cache_from:
         - rust:latest
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
     restart: on-failure
     links:
       - "mongodb_auth"
@@ -27,6 +32,11 @@ services:
       dockerfile: "Dockerfile.grpc"
       cache_from:
         - rust:latest
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
     restart: on-failure
     links:
       - "mongodb_auth"
@@ -42,6 +52,11 @@ services:
   redis_auth:
     image: redis:latest
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
     volumes:
       - redis_data:/data
     networks:
@@ -52,6 +67,11 @@ services:
   mongodb_auth:
     image: mongo:latest
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
     volumes:
       - mongodb_data:/data/db
     environment:
