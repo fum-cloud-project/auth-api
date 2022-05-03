@@ -22,6 +22,7 @@ use tonic::transport::Server;
 //external modules
 use actix::Actor;
 use mongodb::{options::ClientOptions, Client};
+use std::sync::Arc;
 
 #[actix_web::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -59,8 +60,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let auth_server = Auth {
         db: db_addr.clone(),
         cache: cache_addr.clone(),
-        salt: dotenv!("SALT_STR").to_string(),
-        secret: dotenv!("SECRET").to_string(),
+        salt: Arc::new(dotenv!("SALT_STR")),
+        secret: Arc::new(dotenv!("SECRET").as_bytes()),
     };
 
     Server::builder()

@@ -11,13 +11,14 @@ use tonic::{Request, Response, Status};
 use crate::actix::Addr;
 use crate::actors::cache::CacheActor;
 use crate::actors::database::DbActor;
+use std::sync::Arc;
 
 #[derive(Debug)]
 pub struct Auth {
     pub db: Addr<DbActor>,
     pub cache: Addr<CacheActor>,
-    pub salt: String,
-    pub secret: String,
+    pub salt: Arc<&'static str>,
+    pub secret: Arc<&'static [u8]>,
 }
 
 #[tonic::async_trait]
@@ -28,7 +29,7 @@ impl AuthService for Auth {
         let db = self.db.clone();
         let cache = self.cache.clone();
         let bearer_tok = inner_msg.jwt;
-        let secret: String = self.secret.chars().collect();
+        let secret = self.secret.clone();
         let method = inner_msg.method;
         let method = if Method::Get as i32 == method {
             IMethod::GET
@@ -88,7 +89,7 @@ impl AuthService for Auth {
     }
     async fn get_user(&self, request: Request<JsonWebToken>) -> Result<Response<User>, Status> {
         println!("Got a request: {:?}", request);
-        let secret: String = self.secret.chars().collect();
+        let secret = self.secret.clone();
         let _id = match verify_token_and_get_user_id(request.into_inner().jwt, secret).await {
             Ok(_id) => _id,
             _ => {

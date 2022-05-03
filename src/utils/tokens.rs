@@ -5,12 +5,13 @@ use crate::actors::cache::tokens::{
 use crate::actors::cache::CacheActor;
 use crate::cache_schemas::tokens::{Claims, TokenType};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
+use std::sync::Arc;
 
 pub async fn gen_tokens(
     user_id: String,
     user_access_level: i32,
     cache: Addr<CacheActor>,
-    secret: String,
+    secret: Arc<&[u8]>,
 ) -> Result<(String, String), ()> {
     let refresh_token = Claims::new(
         user_id.clone(),
@@ -28,7 +29,7 @@ pub async fn gen_tokens(
     let refresh_token_string = match encode(
         &Header::default(),
         &refresh_token,
-        &EncodingKey::from_secret(secret.as_ref()),
+        &EncodingKey::from_secret(*secret),
     ) {
         Ok(val) => val,
         _ => {
@@ -39,7 +40,7 @@ pub async fn gen_tokens(
     let access_token_string = match encode(
         &Header::default(),
         &access_token,
-        &EncodingKey::from_secret(secret.as_ref()),
+        &EncodingKey::from_secret(*secret),
     ) {
         Ok(val) => val,
         _ => {
@@ -76,12 +77,12 @@ fn is_token_expired(exp: i64, length: i64) -> bool {
 
 pub async fn verify_token(
     token: String,
-    secret: String,
+    secret: Arc<&[u8]>,
     cache: Addr<CacheActor>,
 ) -> Result<(String, i32), ()> {
     let token_s = match decode::<Claims>(
         &token,
-        &DecodingKey::from_secret(secret.as_ref()),
+        &DecodingKey::from_secret(*secret),
         &Validation::default(),
     ) {
         Ok(val) => val,
@@ -139,12 +140,12 @@ pub async fn verify_token(
 
 pub async fn refresh_token(
     token: String,
-    secret: String,
+    secret: Arc<&[u8]>,
     cache: Addr<CacheActor>,
 ) -> Result<(String, String), u8> {
     let token_s = match decode::<Claims>(
         &token,
-        &DecodingKey::from_secret(secret.as_ref()),
+        &DecodingKey::from_secret(*secret),
         &Validation::default(),
     ) {
         Ok(val) => val,
@@ -223,11 +224,11 @@ pub async fn revoke_token(token: String, cache: Addr<CacheActor>) -> Result<bool
 
 pub async fn verify_token_and_get_user_id(
     token: String,
-    secret: String,
+    secret: Arc<&[u8]>,
 ) -> Result<bson::oid::ObjectId, ()> {
     let token_s = match decode::<Claims>(
         &token,
-        &DecodingKey::from_secret(secret.as_ref()),
+        &DecodingKey::from_secret(*secret),
         &Validation::default(),
     ) {
         Ok(val) => val,

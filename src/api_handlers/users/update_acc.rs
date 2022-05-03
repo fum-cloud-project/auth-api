@@ -21,7 +21,7 @@ pub async fn update(
     let id = ObjectId::parse_str(req.extensions().get::<String>().unwrap()).unwrap();
     let db = state.as_ref().db.clone();
     let salt = &state.as_ref().salt;
-    let salt = salt.to_string();
+    let salt = salt.clone();
     let user = user.into_inner();
     let user_json = match serde_json::to_value(&user) {
         Ok(val) => val,

@@ -17,7 +17,7 @@ use serde_json::json;
 pub async fn sign_in(user: Json<UserDataSignIn>, state: Data<AppState>) -> impl Responder {
     let db = state.as_ref().db.clone();
     let secret = &state.as_ref().secret;
-    let secret = secret.to_string();
+    let secret = secret.clone();
     let user = user.into_inner();
     let user_json = match serde_json::to_value(&user) {
         Ok(val) => val,
