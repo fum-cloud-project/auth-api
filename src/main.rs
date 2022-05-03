@@ -33,6 +33,7 @@ use actix_files::NamedFile;
 use actix_web::middleware::Logger;
 use actix_web::{get, http, web::Data, App, HttpServer};
 use mongodb::{options::ClientOptions, Client};
+use std::sync::Arc;
 
 lazy_static! {
     static ref DOCS: std::path::PathBuf = {
@@ -58,6 +59,7 @@ async fn main() -> std::io::Result<()> {
     let db_url = dotenv!("DATABASE_URL");
     let cache_url = dotenv!("REDIS_URL");
     let log_file = dotenv!("API_LOG_FILE");
+    let secret = Arc::new(dotenv!("SECRET").as_bytes());
     setup_logger(log_file).expect("Logger initialization failed.");
     let client_options = match ClientOptions::parse(db_url).await {
         Ok(co) => co,
@@ -95,7 +97,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(rbac::Rbac {
                 db: db_addr.clone(),
                 cache: cache_addr.clone(),
-                secret: dotenv!("SECRET").to_string(),
+                secret: secret.clone(),
             })
             .wrap(cors)
             .wrap(Logger::default())
@@ -127,8 +129,8 @@ async fn main() -> std::io::Result<()> {
             .app_data(Data::new(AppState {
                 db: db_addr.clone(),
                 cache: cache_addr.clone(),
-                salt: dotenv!("SALT_STR").to_string(),
-                secret: dotenv!("SECRET").to_string(),
+                salt: Arc::new(dotenv!("SALT_STR")),
+                secret: secret.clone(),
             }))
     })
     .bind((

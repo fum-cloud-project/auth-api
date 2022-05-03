@@ -10,6 +10,7 @@ use actix_web_httpauth::extractors::AuthExtractor;
 use serde_json::json;
 use std::future::{ready, Ready};
 use std::rc::Rc;
+use std::sync::Arc;
 
 use actix_web::{
     dev::{forward_ready, Service, ServiceRequest, ServiceResponse, Transform},
@@ -20,7 +21,7 @@ use futures_util::future::LocalBoxFuture;
 pub struct Rbac {
     pub db: Addr<DbActor>,
     pub cache: Addr<CacheActor>,
-    pub secret: String,
+    pub secret: Arc<&'static [u8]>,
 }
 
 impl<S, B> Transform<S, ServiceRequest> for Rbac
@@ -40,7 +41,7 @@ where
             service: std::rc::Rc::new(service),
             db: self.db.clone(),
             cache: self.cache.clone(),
-            secret: self.secret.chars().collect(),
+            secret: self.secret.clone(),
         }))
     }
 }
@@ -49,7 +50,7 @@ pub struct RbacMiddleware<S> {
     service: Rc<S>,
     db: Addr<DbActor>,
     cache: Addr<CacheActor>,
-    secret: String,
+    secret: Arc<&'static [u8]>,
 }
 
 impl<S, B> Service<ServiceRequest> for RbacMiddleware<S>
@@ -76,7 +77,7 @@ where
         let db = self.db.clone();
         let cache = self.cache.clone();
         let bearer_tok = BearerAuth::from_service_request(&req);
-        let secret: String = self.secret.chars().collect();
+        let secret = self.secret.clone();
         let method = req.method();
         let method = match *method {
             actix_web::http::Method::GET => Method::GET,
