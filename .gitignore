@@ -4,3 +4,5 @@
 /__pycache__
 /python_helpers/__pycache__
 .env
+.env.dev
+.env.docker
