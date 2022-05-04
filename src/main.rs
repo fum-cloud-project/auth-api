@@ -33,6 +33,7 @@ use actix_files::NamedFile;
 use actix_web::middleware::Logger;
 use actix_web::{get, http, web::Data, App, HttpServer};
 use mongodb::{options::ClientOptions, Client};
+use std::path::Path;
 use std::sync::Arc;
 
 lazy_static! {
@@ -44,13 +45,11 @@ lazy_static! {
 
 #[get("/")]
 async fn index_with() -> NamedFile {
-    println!("hey");
     NamedFile::open_async(DOCS.clone()).await.unwrap()
 }
 
 #[get("")]
 async fn index() -> NamedFile {
-    println!("hey");
     NamedFile::open_async(DOCS.clone()).await.unwrap()
 }
 
@@ -59,7 +58,11 @@ async fn main() -> std::io::Result<()> {
     let db_url = dotenv!("DATABASE_URL");
     let cache_url = dotenv!("REDIS_URL");
     let log_file = dotenv!("API_LOG_FILE");
+    let admin_email = dotenv!("ADMIN_EMAIL");
+    let admin_password = dotenv!("ADMIN_PASSWORD");
     let secret = Arc::new(dotenv!("SECRET").as_bytes());
+    let salt = Arc::new(dotenv!("SALT_STR"));
+    let resources = Path::new(dotenv!("RESOURCES"));
     setup_logger(log_file).expect("Logger initialization failed.");
     let client_options = match ClientOptions::parse(db_url).await {
         Ok(co) => co,
@@ -71,12 +74,6 @@ async fn main() -> std::io::Result<()> {
     let db = client.database("cloudFUMAuthDB");
     let actor_db = actors::database::DbActor(db);
     let db_addr = actor_db.start();
-    match add_resources(db_addr.clone()).await {
-        Err(_) => {
-            panic!("Adding resources failed");
-        }
-        _ => {}
-    };
 
     let cc = redis::Client::open(cache_url).unwrap();
     let actor_cache = if let Ok(cm) = cc.get_tokio_connection_manager().await {
@@ -87,6 +84,20 @@ async fn main() -> std::io::Result<()> {
     let actor_cache = actors::cache::CacheActor(actor_cache);
     let cache_addr = actor_cache.start();
 
+    match add_resources(
+        db_addr.clone(),
+        salt.clone(),
+        resources,
+        admin_email,
+        admin_password,
+    )
+    .await
+    {
+        Err(_) => {
+            panic!("Adding resources failed");
+        }
+        _ => {}
+    };
     HttpServer::new(move || {
         let cors = Cors::default()
             .allowed_methods(vec!["GET", "POST", "PUT", "DELETE"])
@@ -129,7 +140,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(Data::new(AppState {
                 db: db_addr.clone(),
                 cache: cache_addr.clone(),
-                salt: Arc::new(dotenv!("SALT_STR")),
+                salt: salt.clone(),
                 secret: secret.clone(),
             }))
     })
