@@ -22,6 +22,7 @@ use tonic::transport::Server;
 //external modules
 use actix::Actor;
 use mongodb::{options::ClientOptions, Client};
+use std::path::Path;
 use std::sync::Arc;
 
 #[actix_web::main]
@@ -30,6 +31,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let db_url = dotenv!("DATABASE_URL");
     let cache_url = dotenv!("REDIS_URL");
     let log_file = dotenv!("GRPC_LOG_FILE");
+    let admin_email = dotenv!("ADMIN_EMAIL");
+    let admin_password = dotenv!("ADMIN_PASSWORD");
+    let salt = Arc::new(dotenv!("SALT_STR"));
+    let resources = Path::new(dotenv!("RESOURCES"));
     setup_logger(log_file).expect("Logger initialization failed.");
     let client_options = match ClientOptions::parse(db_url).await {
         Ok(co) => co,
@@ -41,7 +46,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let db = client.database("cloudFUMAuthDB");
     let actor_db = actors::database::DbActor(db);
     let db_addr = actor_db.start();
-    match add_resources(db_addr.clone()).await {
+    match add_resources(
+        db_addr.clone(),
+        salt.clone(),
+        resources,
+        admin_email,
+        admin_password,
+    )
+    .await
+    {
         Err(_) => {
             panic!("Adding resources failed");
         }
