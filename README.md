@@ -1,5 +1,5 @@
 # User management and authentication micro-service
-This worker provides API to both admin and user as well as GRPC interface for other micro-services. You can find the documentation at [docs folder]() in org and html format or by accessing GET /api/docs after running the project.
+This worker provides API to both admin and user as well as GRPC interface for other micro-services. You can find the documentation at [docs folder](https://github.com/fum-cloud-project/auth-api/tree/master/docs) in org and html format or by accessing GET /api/docs after running the project.
 
 ## Running in development environment
 Prior to building the project you must use the .env.sample file to create a .env file with correct information about the development environment. Here you can see some information about these variables.
