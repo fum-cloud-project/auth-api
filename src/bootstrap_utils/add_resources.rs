@@ -1,5 +1,4 @@
 use crate::actix::Addr;
-use crate::actors::cache::CacheActor;
 use crate::actors::database::resources::CreateOrUpdateResource;
 use crate::actors::database::users::CreateUser;
 use crate::actors::database::DbActor;
