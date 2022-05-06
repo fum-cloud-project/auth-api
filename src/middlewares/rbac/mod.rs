@@ -66,14 +66,11 @@ where
     forward_ready!(service);
 
     fn call(&self, req: ServiceRequest) -> Self::Future {
-        let mut path = if let Some(s) = req.match_pattern() {
+        let path = if let Some(s) = req.match_pattern() {
             s.to_owned()
         } else {
             req.path().to_owned()
         };
-        if path.chars().last().unwrap_or_default() == '/' {
-            path.pop();
-        }
         let db = self.db.clone();
         let cache = self.cache.clone();
         let bearer_tok = BearerAuth::from_service_request(&req);
