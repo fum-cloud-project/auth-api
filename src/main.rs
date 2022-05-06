@@ -19,8 +19,8 @@ use crate::api_handlers::auth::{
     refresh::refresh, sign_in::sign_in, sign_out::sign_out, sign_up::sign_up,
 };
 use crate::api_handlers::users::{
-    create::create, delete::delete_admin, delete_acc::delete, get_many::get_many, get_one::get_one,
-    update::update_admin, update_acc::update,
+    create::create, delete::delete_admin, delete_acc::delete, get_many::get_many,
+    get_my_acc::get_my_acc, get_one::get_one, update::update_admin, update_acc::update,
 };
 use crate::bootstrap_utils::setup_logger::setup_logger;
 use crate::middlewares::rbac;
@@ -31,7 +31,7 @@ use actix::Actor;
 use actix_cors::Cors;
 use actix_files::NamedFile;
 use actix_web::middleware::Logger;
-use actix_web::{get, http, web::Data, App, HttpServer};
+use actix_web::{get, http, middleware, web::Data, App, HttpServer};
 use mongodb::{options::ClientOptions, Client};
 use std::path::Path;
 use std::sync::Arc;
@@ -41,11 +41,6 @@ lazy_static! {
         let path = dotenv!("DOCS_PATH");
         std::path::PathBuf::from(path)
     };
-}
-
-#[get("/")]
-async fn index_with() -> NamedFile {
-    NamedFile::open_async(DOCS.clone()).await.unwrap()
 }
 
 #[get("")]
@@ -112,6 +107,7 @@ async fn main() -> std::io::Result<()> {
             })
             .wrap(cors)
             .wrap(Logger::default())
+            .wrap(middleware::NormalizePath::trim())
             .service(
                 actix_web::web::scope("/api")
                     .service(
@@ -126,16 +122,13 @@ async fn main() -> std::io::Result<()> {
                             .service(create)
                             .service(update)
                             .service(update_admin)
+                            .service(get_my_acc)
                             .service(get_one)
                             .service(get_many)
                             .service(delete)
                             .service(delete_admin),
                     )
-                    .service(
-                        actix_web::web::scope("/docs")
-                            .service(index)
-                            .service(index_with),
-                    ),
+                    .service(actix_web::web::scope("/docs").service(index)),
             )
             .app_data(Data::new(AppState {
                 db: db_addr.clone(),
