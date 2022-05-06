@@ -3,6 +3,17 @@ use bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, MessageResponse)]
+pub struct PasswordlessUsers {
+    pub _id: ObjectId,
+    pub first_name: String,
+    pub last_name: String,
+    pub email: String,
+    pub access_level: i32,
+    pub creation_date: chrono::DateTime<chrono::Utc>,
+    pub is_deleted: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize, MessageResponse)]
 pub struct Users {
     pub _id: ObjectId,
     pub first_name: String,

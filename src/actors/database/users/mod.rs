@@ -1,6 +1,6 @@
 use crate::actix::{Handler, Message, ResponseFuture};
 use crate::actors::database::DbActor;
-use crate::db_schemas::users::Users;
+use crate::db_schemas::users::{PasswordlessUsers, Users};
 use bson::oid::ObjectId;
 use futures_util::TryStreamExt;
 use mongodb::bson::doc;
@@ -66,7 +66,7 @@ pub struct GetUserWithId {
 }
 
 #[derive(Message)]
-#[rtype(result = "Result<Vec<Users>, u8>")]
+#[rtype(result = "Result<Vec<PasswordlessUsers>, u8>")]
 pub struct GetUsersWithFilter {
     pub email: Option<String>,
     pub first_name: Option<String>,
@@ -245,16 +245,19 @@ impl Handler<GetUserWithId> for DbActor {
 }
 
 impl Handler<GetUsersWithFilter> for DbActor {
-    type Result = ResponseFuture<Result<Vec<Users>, u8>>;
+    type Result = ResponseFuture<Result<Vec<PasswordlessUsers>, u8>>;
 
     fn handle(&mut self, msg: GetUsersWithFilter, _: &mut Self::Context) -> Self::Result {
-        let collection = self.0.collection::<Users>("Users");
+        let collection = self.0.collection::<PasswordlessUsers>("Users");
         Box::pin(async move {
-            let mut res: Vec<Users> = Vec::new();
+            let mut res: Vec<PasswordlessUsers> = Vec::new();
             let mut doc_find = doc! {"is_deleted" : false};
             let mut options = mongodb::options::FindOptions::default();
             options.limit = Some(msg.limit);
             options.skip = Some(msg.skip);
+            options.projection = Some(doc! {
+                "password" : 0
+            });
             if let Some(first_name) = msg.first_name {
                 doc_find.insert(
                     "first_name",
