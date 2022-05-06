@@ -14,6 +14,9 @@ Prior to building the project you must use the .env.sample file to create a .env
 9. GRPC_LOG_FILE : path to a file you wish to have generated logs by the grpc_handler
 10. SALT_STR : salt string for adding to hashed passwords, have in mind that salt is a 22-character Base64 encoding of the 16 bytes of salt. The salt must be exactly this long
 11. SECRET : secret string for generating JWT
+12. ADMIN_EMAIL : email for auto created admin user
+13. ADMIN_PASSWORD : password for auto created admin user
+14. RESOURCE : path to json file containing resource definitions
 
 Have in mind that if any of the above is invalid the server will panic and won't run properly. Make sure a mongodb instance and a redis instance is running before you execute the server.
 After creating this file all you need to do is to run:
