@@ -222,6 +222,7 @@ pub async fn revoke_token(token: String, cache: Addr<CacheActor>) -> Result<bool
     }
 }
 
+#[allow(dead_code)]
 pub async fn verify_token_and_get_user_id(
     token: String,
     secret: Arc<&[u8]>,
