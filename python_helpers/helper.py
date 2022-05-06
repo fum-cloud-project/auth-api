@@ -1,4 +1,5 @@
 #testing auth api using request
+from lib2to3.pgen2 import token
 import requests 
 import json
 import time
@@ -86,6 +87,12 @@ def get_one_user(token, _id, url="http://localhost:8080/api/users/"):
     print(json.dumps(json.loads(response.text), indent=4))
     return json.loads(response.text)
 
+def get_my_acc(token, url="http://localhost:8080/api/users/my_acc"):
+    headers = {'Authorization': 'Bearer ' + token}
+    response = requests.request("GET", url, headers=headers)
+    print(json.dumps(json.loads(response.text), indent=4))
+    return json.loads(response.text)
+
 def get_many_users(token, first_name, last_name, email, access_level, access_level_cmp, page =1, size=20, url="http://localhost:8080/api/users/"):
     headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token}
     #build query string from parameters if not empty or None
@@ -122,6 +129,9 @@ def get_many_users(token, first_name, last_name, email, access_level, access_lev
 
 # create 10 random users with access_level 1
 tokens = signin("test@test.com", "testtest")
+
+get_my_acc(tokens['access_token'])
+tokens = refresh(tokens['access_token'], tokens['refresh_token'])
 
 for i in range(10):
     create_user(tokens['access_token'], "test" + str(i), "test" + str(i), "test" + str(i) + "@test.com", "testtest", 1)
