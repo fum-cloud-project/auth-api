@@ -12,7 +12,7 @@ use actix_web::{
 use bson::oid::ObjectId;
 use serde_json::json;
 
-#[put("/")]
+#[put("")]
 pub async fn update(
     req: HttpRequest,
     user: Json<UserDataUpdate>,

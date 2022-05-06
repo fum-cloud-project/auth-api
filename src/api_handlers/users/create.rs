@@ -11,7 +11,7 @@ use actix_web::{
 };
 use serde_json::json;
 
-#[post("/")]
+#[post("")]
 pub async fn create(
     req: HttpRequest,
     user: Json<UserDataCreate>,

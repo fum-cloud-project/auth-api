@@ -20,7 +20,17 @@ pub async fn get_one(id: Path<(String,)>, state: Data<AppState>) -> impl Respond
     match db.send(GetUserWithId { _id: id }).await {
         Ok(Ok(Ok(s))) => HttpResponse::Ok().json(json!({
             "message": "User retrieved successfully",
-            "data" : [s],
+            "data" : [
+                {
+                    "_id" : s._id,
+                    "first_name" : s.first_name,
+                    "last_name" : s.last_name,
+                    "email" : s.email,
+                    "access_level" : s.access_level,
+                    "creation_date" : s.creation_date,
+                    "is_deleted" : s.is_deleted
+                }
+            ],
         })),
         Ok(Err(e)) if e == 0 => {
             HttpResponse::NotFound().json(json!({ "message": "This user does not exist" }))

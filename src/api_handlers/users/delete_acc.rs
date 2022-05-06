@@ -5,7 +5,7 @@ use actix_web::{delete, web::Data, HttpMessage, HttpRequest, HttpResponse, Respo
 use bson::oid::ObjectId;
 use serde_json::json;
 
-#[delete("/")]
+#[delete("")]
 pub async fn delete(req: HttpRequest, state: Data<AppState>) -> impl Responder {
     let id_str = req.extensions().get::<String>().unwrap().to_owned();
     let id = ObjectId::parse_str(id_str.to_owned()).unwrap();

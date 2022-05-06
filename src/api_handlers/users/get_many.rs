@@ -19,7 +19,7 @@ pub struct UserFilter {
     pub access_level_cmp: Option<u8>,
 }
 
-#[get("/")]
+#[get("")]
 pub async fn get_many(filter: Query<UserFilter>, state: Data<AppState>) -> impl Responder {
     let db = state.as_ref().db.clone();
     let page = filter.page.unwrap_or(1);
