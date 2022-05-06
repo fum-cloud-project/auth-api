@@ -646,126 +646,226 @@ pub struct UserFilter {
     "message": "Users retrieved successfully",
     "data": {
         "page": 1,
-        "total_count": 10,
+        "total_count": 836,
         "data": [
             {
                 "_id": {
-                    "$oid": "626fa45c49a4b8812b87c114"
+                    "$oid": "627165a72e2d4b90b25b761b"
                 },
-                "first_name": "test0",
-                "last_name": "test0",
-                "email": "test100@test.com",
-                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "first_name": "test178",
+                "last_name": "test178",
+                "email": "test178@gmail.com",
                 "access_level": 1,
-                "creation_date": "2022-05-02T09:29:00.332838625Z",
+                "creation_date": "2022-05-03T17:25:59.389287970Z",
                 "is_deleted": false
             },
             {
                 "_id": {
-                    "$oid": "626fa45c49a4b8812b87c115"
+                    "$oid": "627165a72e2d4b90b25b761c"
                 },
-                "first_name": "test2",
-                "last_name": "test2",
-                "email": "test101@test.com",
-                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "first_name": "test179",
+                "last_name": "test179",
+                "email": "test179@gmail.com",
                 "access_level": 1,
-                "creation_date": "2022-05-02T09:29:00.685498505Z",
+                "creation_date": "2022-05-03T17:25:59.389724778Z",
                 "is_deleted": false
             },
             {
                 "_id": {
-                    "$oid": "626fa45d49a4b8812b87c116"
+                    "$oid": "627165a72e2d4b90b25b761d"
                 },
-                "first_name": "test4",
-                "last_name": "test4",
-                "email": "test102@test.com",
-                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "first_name": "test166",
+                "last_name": "test166",
+                "email": "test166@gmail.com",
                 "access_level": 1,
-                "creation_date": "2022-05-02T09:29:01.038923716Z",
+                "creation_date": "2022-05-03T17:25:59.390422573Z",
                 "is_deleted": false
             },
             {
                 "_id": {
-                    "$oid": "626fa45d49a4b8812b87c117"
+                    "$oid": "627165a72e2d4b90b25b761e"
                 },
-                "first_name": "test6",
-                "last_name": "test6",
-                "email": "test103@test.com",
-                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "first_name": "test177",
+                "last_name": "test177",
+                "email": "test177@gmail.com",
                 "access_level": 1,
-                "creation_date": "2022-05-02T09:29:01.391341354Z",
+                "creation_date": "2022-05-03T17:25:59.391446797Z",
                 "is_deleted": false
             },
             {
                 "_id": {
-                    "$oid": "626fa45d49a4b8812b87c118"
+                    "$oid": "627165a72e2d4b90b25b761f"
                 },
-                "first_name": "test8",
-                "last_name": "test8",
-                "email": "test104@test.com",
-                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "first_name": "test176",
+                "last_name": "test176",
+                "email": "test176@gmail.com",
                 "access_level": 1,
-                "creation_date": "2022-05-02T09:29:01.741648961Z",
+                "creation_date": "2022-05-03T17:25:59.421910615Z",
                 "is_deleted": false
             },
             {
                 "_id": {
-                    "$oid": "626fa45e49a4b8812b87c119"
+                    "$oid": "627165a72e2d4b90b25b7620"
                 },
-                "first_name": "test10",
-                "last_name": "test10",
-                "email": "test105@test.com",
-                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "first_name": "test186",
+                "last_name": "test186",
+                "email": "test186@gmail.com",
                 "access_level": 1,
-                "creation_date": "2022-05-02T09:29:02.092838237Z",
+                "creation_date": "2022-05-03T17:25:59.440838222Z",
                 "is_deleted": false
             },
             {
                 "_id": {
-                    "$oid": "626fa45e49a4b8812b87c11a"
+                    "$oid": "627165a72e2d4b90b25b7621"
                 },
-                "first_name": "test12",
-                "last_name": "test12",
-                "email": "test106@test.com",
-                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "first_name": "test181",
+                "last_name": "test181",
+                "email": "test181@gmail.com",
                 "access_level": 1,
-                "creation_date": "2022-05-02T09:29:02.442527442Z",
+                "creation_date": "2022-05-03T17:25:59.440860209Z",
                 "is_deleted": false
             },
             {
                 "_id": {
-                    "$oid": "626fa45e49a4b8812b87c11b"
+                    "$oid": "627165a72e2d4b90b25b7622"
                 },
-                "first_name": "test14",
-                "last_name": "test14",
-                "email": "test107@test.com",
-                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "first_name": "test187",
+                "last_name": "test187",
+                "email": "test187@gmail.com",
                 "access_level": 1,
-                "creation_date": "2022-05-02T09:29:02.792700929Z",
+                "creation_date": "2022-05-03T17:25:59.440871354Z",
                 "is_deleted": false
             },
             {
                 "_id": {
-                    "$oid": "626fa45f49a4b8812b87c11c"
+                    "$oid": "627165a72e2d4b90b25b7623"
                 },
-                "first_name": "test16",
-                "last_name": "test16",
-                "email": "test108@test.com",
-                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "first_name": "test183",
+                "last_name": "test183",
+                "email": "test183@gmail.com",
                 "access_level": 1,
-                "creation_date": "2022-05-02T09:29:03.143907645Z",
+                "creation_date": "2022-05-03T17:25:59.454128680Z",
                 "is_deleted": false
             },
             {
                 "_id": {
-                    "$oid": "626fa45f49a4b8812b87c11d"
+                    "$oid": "627165a72e2d4b90b25b7624"
                 },
-                "first_name": "test18",
-                "last_name": "test18",
-                "email": "test109@test.com",
-                "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
+                "first_name": "test185",
+                "last_name": "test185",
+                "email": "test185@gmail.com",
                 "access_level": 1,
-                "creation_date": "2022-05-02T09:29:03.497216217Z",
+                "creation_date": "2022-05-03T17:25:59.465539934Z",
+                "is_deleted": false
+            },
+            {
+                "_id": {
+                    "$oid": "627165a72e2d4b90b25b7625"
+                },
+                "first_name": "test189",
+                "last_name": "test189",
+                "email": "test189@gmail.com",
+                "access_level": 1,
+                "creation_date": "2022-05-03T17:25:59.472019516Z",
+                "is_deleted": false
+            },
+            {
+                "_id": {
+                    "$oid": "627165a72e2d4b90b25b7626"
+                },
+                "first_name": "test180",
+                "last_name": "test180",
+                "email": "test180@gmail.com",
+                "access_level": 1,
+                "creation_date": "2022-05-03T17:25:59.472632670Z",
+                "is_deleted": false
+            },
+            {
+                "_id": {
+                    "$oid": "627165a72e2d4b90b25b7627"
+                },
+                "first_name": "test188",
+                "last_name": "test188",
+                "email": "test188@gmail.com",
+                "access_level": 1,
+                "creation_date": "2022-05-03T17:25:59.493355320Z",
+                "is_deleted": false
+            },
+            {
+                "_id": {
+                    "$oid": "627165a72e2d4b90b25b7628"
+                },
+                "first_name": "test191",
+                "last_name": "test191",
+                "email": "test191@gmail.com",
+                "access_level": 1,
+                "creation_date": "2022-05-03T17:25:59.521922589Z",
+                "is_deleted": false
+            },
+            {
+                "_id": {
+                    "$oid": "627165a72e2d4b90b25b7629"
+                },
+                "first_name": "test182",
+                "last_name": "test182",
+                "email": "test182@gmail.com",
+                "access_level": 1,
+                "creation_date": "2022-05-03T17:25:59.548845077Z",
+                "is_deleted": false
+            },
+            {
+                "_id": {
+                    "$oid": "627165a72e2d4b90b25b762a"
+                },
+                "first_name": "test193",
+                "last_name": "test193",
+                "email": "test193@gmail.com",
+                "access_level": 1,
+                "creation_date": "2022-05-03T17:25:59.569318707Z",
+                "is_deleted": false
+            },
+            {
+                "_id": {
+                    "$oid": "627165a72e2d4b90b25b762b"
+                },
+                "first_name": "test192",
+                "last_name": "test192",
+                "email": "test192@gmail.com",
+                "access_level": 1,
+                "creation_date": "2022-05-03T17:25:59.571119977Z",
+                "is_deleted": false
+            },
+            {
+                "_id": {
+                    "$oid": "627165a72e2d4b90b25b762c"
+                },
+                "first_name": "test184",
+                "last_name": "test184",
+                "email": "test184@gmail.com",
+                "access_level": 1,
+                "creation_date": "2022-05-03T17:25:59.580613010Z",
+                "is_deleted": false
+            },
+            {
+                "_id": {
+                    "$oid": "627165a72e2d4b90b25b762d"
+                },
+                "first_name": "test197",
+                "last_name": "test197",
+                "email": "test197@gmail.com",
+                "access_level": 1,
+                "creation_date": "2022-05-03T17:25:59.614473444Z",
+                "is_deleted": false
+            },
+            {
+                "_id": {
+                    "$oid": "627165a72e2d4b90b25b762e"
+                },
+                "first_name": "test204",
+                "last_name": "test204",
+                "email": "test204@gmail.com",
+                "access_level": 1,
+                "creation_date": "2022-05-03T17:25:59.632247673Z",
                 "is_deleted": false
             }
         ]
@@ -778,7 +878,7 @@ pub struct UserFilter {
 - path: /api/users/{id}
 - path_params:
   - id: valid ObjectId string
-- method: DELETE
+- method: GET
 - header: Authorization Bearer <access_token>
 - example 401:
   - invalid token within header
@@ -813,7 +913,6 @@ pub struct UserFilter {
             "first_name": "test0",
             "last_name": "test0",
             "email": "test100@test.com",
-            "password": "$2b$10$YXNkZmdoamtsbW5idmN4ee4g8upf7s4E6kQtSomF1GmK09UmLHizS",
             "access_level": 1,
             "creation_date": "2022-05-02T09:29:00.332838625Z",
             "is_deleted": false
@@ -822,6 +921,39 @@ pub struct UserFilter {
 }
     #+END_SRC
 
+*** Get my account (normal user)
+- path: /api/users/my_acc
+- method: GET
+- header: Authorization Bearer <access_token>
+- example 401:
+  - invalid token within header
+  - response:
+    #+BEGIN_SRC json
+{
+    "issues": [
+        "You don't have access to this resource"
+    ]
+}
+    #+END_SRC
+- example 200:
+  - valid token in header
+  - response:
+    #+BEGIN_SRC json
+{
+    "message": "Your account was retrieved successfully",
+    "data": [
+        {
+            "_id": {
+                "$oid": "62712e0f7e293b13ea85eeee"
+            },
+            "first_name": "test",
+            "last_name": "test",
+            "email": "test@test.com",
+            "access_level": 1
+        }
+    ]
+}
+    #+END_SRC
 * GRPC server
 ** Protocol
     You can find .proto file in projects root inside proto folder. What each message represents is pretty self explanatory.
