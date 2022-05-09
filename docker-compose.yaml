@@ -61,8 +61,6 @@ services:
       - redis_data:/data
     networks:
       - rusty_net
-    ports:
-      - "6379:6379"
 
   mongodb_auth:
     image: mongo:latest
@@ -79,8 +77,6 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: "12345678"
     networks:
       - rusty_net
-    ports:
-      - "27017:27017"
 
 networks:
   rusty_net:
