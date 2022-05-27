@@ -1,15 +1,127 @@
 [
-    {"path" : "/api/users", "method" : "POST", "access" : 2},
-    {"path" : "/api/users", "method" : "DELETE", "access" : 1},
-    {"path" : "/api/users/{id}", "method" : "DELETE", "access" : 2},
-    {"path" : "/api/users", "method" : "GET", "access" : 2},
-    {"path" : "/api/users/my_acc", "method" : "GET", "access" : 1},
-    {"path" : "/api/users/{id}", "method" : "GET", "access" : 2},
-    {"path" : "/api/users/{id}", "method" : "PUT", "access" : 2},
-    {"path" : "/api/users", "method" : "PUT", "access" : 1},
-    {"path" : "/api/auth/sign_in", "method" : "POST", "access" : 0},
-    {"path" : "/api/auth/sign_up", "method" : "POST", "access" : 0},
-    {"path" : "/api/auth/sign_out", "method" : "POST", "access" : 1},
-    {"path" : "/api/auth/refresh", "method" : "POST", "access" : 0},
-    {"path" : "/api/docs", "method" : "GET", "access" : 0}
+    {
+        "path": "/api/users",
+        "method": "POST",
+        "access": 2
+    },
+    {
+        "path": "/api/users",
+        "method": "DELETE",
+        "access": 1
+    },
+    {
+        "path": "/api/users/{id}",
+        "method": "DELETE",
+        "access": 2
+    },
+    {
+        "path": "/api/users",
+        "method": "GET",
+        "access": 2
+    },
+    {
+        "path": "/api/users/my_acc",
+        "method": "GET",
+        "access": 1
+    },
+    {
+        "path": "/api/users/{id}",
+        "method": "GET",
+        "access": 2
+    },
+    {
+        "path": "/api/users/{id}",
+        "method": "PUT",
+        "access": 2
+    },
+    {
+        "path": "/api/users",
+        "method": "PUT",
+        "access": 1
+    },
+    {
+        "path": "/api/auth/sign_in",
+        "method": "POST",
+        "access": 0
+    },
+    {
+        "path": "/api/auth/sign_up",
+        "method": "POST",
+        "access": 0
+    },
+    {
+        "path": "/api/auth/sign_out",
+        "method": "POST",
+        "access": 1
+    },
+    {
+        "path": "/api/auth/refresh",
+        "method": "POST",
+        "access": 0
+    },
+    {
+        "path": "/api/docs",
+        "method": "GET",
+        "access": 0
+    },
+    {
+        "path": "/api/docs",
+        "method": "GET",
+        "access": 0
+    },
+    {
+        "path": "/api/docs",
+        "method": "GET",
+        "access": 0
+    },
+    {
+        "path": "/api/catalog/products",
+        "method": "GET",
+        "access": 0
+    },
+    {
+        "path": "/api/catalog/products/{id}",
+        "method": "GET",
+        "access": 0
+    },
+    {
+        "path": "/api/catalog/products",
+        "method": "POST",
+        "access": 2
+    },
+    {
+        "path": "/api/catalog/products/{id}",
+        "method": "DELETE",
+        "access": 2
+    },
+    {
+        "path": "/api/order/cart/additem",
+        "method": "POST",
+        "access": 1
+    },
+    {
+        "path": "/api/order/cart/removeItem",
+        "method": "POST",
+        "access": 1
+    },
+    {
+        "path": "/api/order/cart/{id}",
+        "method": "GET",
+        "access": 1
+    },
+    {
+        "path": "/api/order/cart",
+        "method": "GET",
+        "access": 1
+    },
+    {
+        "path": "/api/order/admin/carts",
+        "method": "GET",
+        "access": 2
+    },
+    {
+        "path": "/api/order/cart/{id}/checkout",
+        "method": "POST",
+        "access": 1
+    }
 ]
