@@ -42,6 +42,16 @@ pub async fn update_admin(
             return HttpResponse::BadRequest().json(json!({ "issues": e }));
         }
     }
+
+    //check if user has non None fields
+    if !(user.email.is_some()
+        || user.first_name.is_some()
+        || user.last_name.is_some()
+        || user.access_level.is_some()
+        || user.password.is_some())
+    {
+        return HttpResponse::BadRequest().json(json!({ "issues": ["At least one field must be provided"] }));
+    }
     if let Some(access_level) = user.access_level {
         if access_level > user_access_level {
             return HttpResponse::Unauthorized().json(

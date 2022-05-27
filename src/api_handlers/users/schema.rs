@@ -52,22 +52,22 @@ pub fn get_update_schema() -> Value {
             "properties": {
                 "email": {
                     "description": "User's email",
-                    "type": "string",
+                    "type": ["string", "null"],
                     "format": "email"
                 },
                 "first_name": {
                     "description": "User's name",
-                    "type": "string"
+                    "type": ["string", "null"]
                 },
                 "password": {
                     "description": "User's password",
-                    "type": "string",
+                    "type": ["string", "null"],
                         "minLength": 8,
                         "maxLength": 128
                 },
                 "first_name": {
                     "description": "User's last name",
-                    "type": "string"
+                    "type": ["string", "null"]
                 }
             },
             "anyOf" : [
@@ -92,26 +92,26 @@ pub fn get_admin_update_schema() -> Value {
             "properties": {
                 "email": {
                     "description": "User's email",
-                    "type": "string",
+                    "type": ["string", "null"],
                     "format": "email"
                 },
                 "first_name": {
                     "description": "User's name",
-                    "type": "string"
+                    "type": ["string", "null"]
                 },
                 "password": {
                     "description": "User's password",
-                    "type": "string",
+                    "type": ["string", "null"],
                         "minLength": 8,
                         "maxLength": 128
                 },
                 "first_name": {
                     "description": "User's last name",
-                    "type": "string"
+                    "type": ["string", "null"]
                 },
                 "access_level": {
                     "description" : "User's access level",
-                    "type" : "integer",
+                    "type" : ["string", "null"],
                     "minimum" : 0
                 }
             },

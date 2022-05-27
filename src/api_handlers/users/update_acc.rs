@@ -35,6 +35,15 @@ pub async fn update(
             return HttpResponse::BadRequest().json(json!({ "issues": e }));
         }
     }
+    
+    //check if user has non None fields
+    if !(user.email.is_some()
+        || user.first_name.is_some()
+        || user.last_name.is_some()
+        || user.password.is_some())
+    {
+        return HttpResponse::BadRequest().json(json!({ "issues": ["At least one field must be provided"] }));
+    }
     let hashed_password = if let Some(p) = user.password {
         match hash_password(salt, p) {
             Ok(val) => Some(val),
