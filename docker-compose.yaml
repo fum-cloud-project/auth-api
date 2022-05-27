@@ -20,7 +20,7 @@ services:
       - "mongodb_auth"
       - "redis_auth"
     networks:
-      - rusty_net
+      - cloud_dev_internal_net
     tty: true
     ports:
       - "8080:8080"
@@ -45,7 +45,7 @@ services:
       - "mongodb_auth"
       - "redis_auth"
     networks:
-      - rusty_net
+      - cloud_dev_internal_net
     tty: true
     ports:
       - "50051:50051"
@@ -60,7 +60,7 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - rusty_net
+      - cloud_dev_internal_net
 
   mongodb_auth:
     image: mongo:latest
@@ -76,10 +76,10 @@ services:
       MONGO_INITDB_ROOT_USERNAME: "clouddev"
       MONGO_INITDB_ROOT_PASSWORD: "12345678"
     networks:
-      - rusty_net
+      - cloud_dev_internal_net
 
 networks:
-  rusty_net:
+  cloud_dev_internal_net:
     driver: bridge
 
 volumes:
