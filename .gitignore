@@ -6,3 +6,4 @@
 .env.docker
 .env
 .env.dev
+.env.kuber
