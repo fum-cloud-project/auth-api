@@ -18,7 +18,7 @@ channel = grpc.insecure_channel('localhost:50051')
 stub = auth_pb2_grpc.AuthServiceStub(channel)
 
 
-url = "http://localhost:8080/api/auth/"
+url = "http://192.168.122.94:30900/api/auth/"
 admin_email = "admin@mail.com"
 admin_password = "adminadmin"
 debug_global = False
@@ -76,7 +76,7 @@ def refresh(token, reftok):
     return json.loads(response.text), response.status_code
 
 
-def update_me(token, first_name, last_name, email, password, url="http://localhost:8080/api/users/"):
+def update_me(token, first_name, last_name, email, password, url="http://192.168.122.94:30900/api/users/"):
     # create payload based on what is passed in if they are not None or empty string
     payload = {}
     if first_name:
@@ -99,7 +99,7 @@ def update_me(token, first_name, last_name, email, password, url="http://localho
     return json.loads(response.text), response.status_code
 
 
-def update_admin(token, _id, first_name, last_name, email, password, access_level, url="http://localhost:8080/api/users/"):
+def update_admin(token, _id, first_name, last_name, email, password, access_level, url="http://192.168.122.94:30900/api/users/"):
     payload = {}
     if first_name:
         payload['first_name'] = first_name
@@ -120,7 +120,7 @@ def update_admin(token, _id, first_name, last_name, email, password, access_leve
     return json.loads(response.text), response.status_code
 
 
-def create_user(token, first_name, last_name, email, password, access_level, url="http://localhost:8080/api/users/"):
+def create_user(token, first_name, last_name, email, password, access_level, url="http://192.168.122.94:30900/api/users/"):
     payload = {'first_name': first_name, 'last_name': last_name,
                'email': email, 'password': password, 'access_level': access_level}
     headers = {'Content-Type': 'application/json',
@@ -134,7 +134,7 @@ def create_user(token, first_name, last_name, email, password, access_level, url
     return json.loads(response.text), response.status_code
 
 
-def delete_me(token, url="http://localhost:8080/api/users/"):
+def delete_me(token, url="http://192.168.122.94:30900/api/users/"):
     headers = {'Content-Type': 'application/json',
                'Authorization': 'Bearer ' + token}
     response = requests.request("DELETE", url, headers=headers)
@@ -143,7 +143,7 @@ def delete_me(token, url="http://localhost:8080/api/users/"):
     return json.loads(response.text), response.status_code
 
 
-def delete_admin(token, _id, url="http://localhost:8080/api/users/"):
+def delete_admin(token, _id, url="http://192.168.122.94:30900/api/users/"):
     headers = {'Content-Type': 'application/json',
                'Authorization': 'Bearer ' + token}
     response = requests.request("DELETE", url + _id, headers=headers)
@@ -152,7 +152,7 @@ def delete_admin(token, _id, url="http://localhost:8080/api/users/"):
     return json.loads(response.text), response.status_code
 
 
-def get_one_user(token, _id, url="http://localhost:8080/api/users/"):
+def get_one_user(token, _id, url="http://192.168.122.94:30900/api/users/"):
     headers = {'Content-Type': 'application/json',
                'Authorization': 'Bearer ' + token}
     response = requests.request("GET", url + _id, headers=headers)
@@ -161,7 +161,7 @@ def get_one_user(token, _id, url="http://localhost:8080/api/users/"):
     return json.loads(response.text), response.status_code
 
 
-def get_my_acc(token, url="http://localhost:8080/api/users/my_acc"):
+def get_my_acc(token, url="http://192.168.122.94:30900/api/users/my_acc"):
     headers = {'Authorization': 'Bearer ' + token}
     response = requests.request("GET", url, headers=headers)
     if debug_global:
@@ -169,7 +169,7 @@ def get_my_acc(token, url="http://localhost:8080/api/users/my_acc"):
     return json.loads(response.text), response.status_code
 
 
-def get_many_users(token, first_name, last_name, email, access_level, access_level_cmp, page=1, size=20, url="http://localhost:8080/api/users/"):
+def get_many_users(token, first_name, last_name, email, access_level, access_level_cmp, page=1, size=20, url="http://192.168.122.94:30900/api/users/"):
     headers = {'Content-Type': 'application/json',
                'Authorization': 'Bearer ' + token}
     # build query string from parameters if not empty or None
@@ -324,6 +324,9 @@ def automated_test_pipeline():
             print("TEST[signout from admin with correct data] failed")
         else:
             print("TEST[signout from admin with correct data] succeeded")
+    # wait for keyboard input then return
+    input("Press Enter to continue...")
+    return
 
 
 def clear_screen():
