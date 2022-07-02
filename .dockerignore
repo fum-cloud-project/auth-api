@@ -4,4 +4,5 @@
 /python_helpers/__pycache__
 .env.docker
 .env.dev
+.env.kuber
 .git
